@@ -34,22 +34,33 @@ namespace ShadowMaker
         private MaterialPropertyBlock propertyBlock;
 
         public Color mColour;
-        private float mAngle = 0;
-        private float mSpread = 180;
+
+        [Range(0, 360)]
+        public float mAngle = 0;
+
+        [Range(0,360)]
+        public float mSpread = 180;
+
         public float mFalloffExponent = 1.0f;
         public float mAngleFalloffExponent = 1.0f;
         public float mFullBrightRadius = 0.0f;
-        private float mRadius = 1.0f;
+
+        public float mRadius = 0.5f;
 
         private void Awake()
         {
             this.propertyBlock = new MaterialPropertyBlock();
 
-            MeshRenderer meshRenderer = this.gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer.sharedMaterial == null)
-            {
-                meshRenderer.sharedMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/LightEmitter"));
-            }
+            //MeshRenderer meshRenderer = this.gameObject.GetComponent<MeshRenderer>();
+            //if (meshRenderer.sharedMaterial == null)
+            //{
+            //    meshRenderer.sharedMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/LightEmitter"));
+            //}
+        }
+
+        private void OnValidate()
+        {
+            this.RebuildQuad();
         }
 
         private void OnEnable()
@@ -114,7 +125,8 @@ namespace ShadowMaker
         /// </summary>
         public void RebuildQuad()
         {
-            Mesh m = GetComponent<MeshFilter>().mesh;
+            Mesh m = GetComponent<MeshFilter>().sharedMesh;
+            m = m ?? new Mesh();
 
             List<Vector3> verts = new List<Vector3>();
 
@@ -152,8 +164,6 @@ namespace ShadowMaker
 
             this.propertyBlock.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mAngle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f));
             this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
-
-            MeshRenderer mr = GetComponent<MeshRenderer>();
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 

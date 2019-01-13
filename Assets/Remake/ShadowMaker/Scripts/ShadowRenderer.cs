@@ -108,12 +108,12 @@ namespace ShadowMaker
             this.screenQuadMesh = ShadowRenderer.CreateScreenQuad();
 
             // Initial shadow map in range 0-540.
-            this.shadowMapInitialMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapInitial"));
+            this.shadowMapInitialMaterial = Resources.Load<Material>("ShadowMapInitialMaterial");
             this.shadowMapInitialRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
 
             // Final shadow map in range 0-360.
-            this.shadowMapFinalMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinal"));
+            this.shadowMapFinalMaterial = Resources.Load<Material>("ShadowMapFinalMaterial");
             this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Default);
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
         }
