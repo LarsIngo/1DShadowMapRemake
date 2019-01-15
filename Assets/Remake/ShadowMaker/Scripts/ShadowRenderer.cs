@@ -22,7 +22,7 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalRenderTexture;
 
-        public const int SHADOWMAP_RESOLUTION = 1024;
+        public const int SHADOWMAP_RESOLUTION = 640;
 
         // --- LIGHTEMITTER --- //
         public const int EMITTER_COUNT_MAX = 64;
@@ -107,7 +107,7 @@ namespace ShadowMaker
 
             // Initial shadow map in range 0-540.
             this.shadowMapInitialMaterial = Resources.Load<Material>("ShadowMapInitialMaterial");
-            this.shadowMapInitialRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
+            this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAP_RESOLUTION * 1.5f), EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
 
             // Final shadow map in range 0-360.
