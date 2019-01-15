@@ -73,16 +73,14 @@ namespace ShadowMaker
 
         private void GizmosDrawArc(float alpha)
         {
-            float radius = this.transform.localScale.x;
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
-            UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, radius);
+            UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, this.Radius);
         }
 
         private void GizmosDrawCircle(float alpha)
         {
-            float radius = this.transform.localScale.x;
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
-            UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, radius);
+            UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, this.Radius);
         }
 
         private void GizmosDrawIcon()
@@ -105,8 +103,9 @@ namespace ShadowMaker
         private void OnWillRenderObject()
         {
             this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh();
-            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.transform.localScale.x;
-            this.transform.localScale = new Vector3(this.transform.localScale.x, yScale, 1.0f);
+            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.transform.lossyScale.x;
+            float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
+            this.transform.localScale = new Vector3(this.transform.localScale.x, yScale / parentScaleFactor, 1.0f);
         }
 
         public float Angle
@@ -129,6 +128,14 @@ namespace ShadowMaker
             }
         }
 
+        public float Radius
+        {
+            get
+            {
+                return this.transform.lossyScale.x;
+            }
+        }
+
         public MaterialPropertyBlock BindShadowMap(RenderTexture shadowMapTexture)
         {
             Vector4 shadowMapParams = LightEmitter.GetShadowMapParams(this.shadowMapSlot);
@@ -140,7 +147,7 @@ namespace ShadowMaker
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
-            float radius = this.transform.lossyScale.x;
+            float radius = this.Radius;
 
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
