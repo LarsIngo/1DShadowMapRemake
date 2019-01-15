@@ -102,10 +102,10 @@ namespace ShadowMaker
 
         private void OnWillRenderObject()
         {
-            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh();
-            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.transform.lossyScale.x;
+            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh(); // Get either half or full quad depending on spread.
+            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.Radius; // Calculate local y scale to fit spread and radius.
             float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
-            this.transform.localScale = new Vector3(this.transform.localScale.x, yScale / parentScaleFactor, 1.0f);
+            this.transform.localScale = new Vector3(this.transform.localScale.x, yScale / parentScaleFactor, 1.0f); // Update scale in order to fit mesh to light spread and radius.
         }
 
         public float Angle
