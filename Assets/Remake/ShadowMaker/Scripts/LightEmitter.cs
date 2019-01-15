@@ -33,7 +33,7 @@ namespace ShadowMaker
 
         private MaterialPropertyBlock propertyBlock;
 
-        public Color mColour = Color.cyan;
+        public Color mColour = new Color(0.2f, 0.72f, 0.2f, 1.0f);
 
         [Range(0,360)]
         public float mSpread = 180;

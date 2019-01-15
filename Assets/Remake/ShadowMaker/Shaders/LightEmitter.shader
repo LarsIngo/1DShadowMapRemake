@@ -25,7 +25,13 @@ Shader "ShadowMaker/LightEmitter"
 		Cull Off
 		Lighting Off
 		ZWrite Off
-		Blend One One
+		Blend SrcAlpha One // Additive blending with Alpha.
+		//Blend One One // Additive blending without Alpha.
+		//Blend SrcAlpha OneMinusSrcAlpha // Traditional transparency
+		//Blend One OneMinusSrcAlpha // Premultiplied transparency
+		//Blend OneMinusDstColor One // Soft Additive
+		//Blend DstColor Zero // Multiplicative
+		//Blend DstColor SrcColor // 2x Multiplicative
 
 		Pass
 		{
@@ -86,7 +92,7 @@ Shader "ShadowMaker/LightEmitter"
 				float u = (polar.x / UNITY_PI + 1.0f) * 0.5f; // [0-1] // Converts from polar angle to shadow map u-coordinate.
 				float shadowMapDistance = tex2D(_ShadowMap, float2(u, shadowMapParams)).r; // [0-1]
 				float shadowMapBlurredDistance = tex2D(_ShadowMapBlurred, float2(u, shadowMapParams)).r; // [0-1] // TODO use this to make soft edges.
-				float shadowMapFactor = pixelDistance < shadowMapDistance ? 1.0f : 0.0f; // Whether pixel is not in shadow.
+				float shadowMapFactor = (sign(shadowMapDistance - pixelDistance) + 1.0f) * 0.5f; // Whether pixel is not in shadow.
 				
 				// Calculate distance fall off.
 				float distFalloff = max(0.0f, length(IN.worldPos.xy - lightPosition.xy) - params2.w) * params2.z;
