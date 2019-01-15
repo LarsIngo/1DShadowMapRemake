@@ -66,22 +66,14 @@ namespace ShadowMaker
         private void OnDrawGizmos()
         {
             GizmosDrawIcon();
-
-            if (!Application.isPlaying)
-            {
-                GizmosDrawArc(0.25f);
-            }
+            GizmosDrawArc(0.25f);
         }
 
         private void OnDrawGizmosSelected()
         {
             GizmosDrawIcon();
-
-            if (!Application.isPlaying)
-            {
-                GizmosDrawArc(1.0f);
-                GizmosDrawCircle(1.0f);
-            }
+            GizmosDrawArc(1.0f);
+            GizmosDrawCircle(1.0f);
         }
 
         private void GizmosDrawArc(float alpha)
