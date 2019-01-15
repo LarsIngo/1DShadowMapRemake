@@ -48,15 +48,31 @@ Shader "ShadowMaker/ShadowMapFinalBlur"
 
             fixed4 frag(appdata_t IN) : SV_Target
             {
-				float dU = _Params.x;
+				return tex2D(_ShadowMap, IN.texcoords);
+			    // TMP
 
+				float2 uv = IN.texcoords;
+
+				// The depth of current fragment.
+				float center = tex2D(_ShadowMap, uv).r;
+
+				// Fragment width in UV-space. Offset scales with depth.
+				float dU = _Params.x * smoothstep(0.0f, 1.0f, center);
+
+				// Gussian blur.
 				float s = 0.0f;
-				for (int kx = -HK; kx <= HK; ++kx)
-				{
-					s += tex2D(_ShadowMap, IN.texcoords + float2(dU * kx, 0.0f)).r;
-				}
 
-				s = s / KERNEL_SIZE;
+				s += tex2D(_ShadowMap, float2(uv.x - (4.0f * dU), uv.y)).r * 0.05f;
+				s += tex2D(_ShadowMap, float2(uv.x - (3.0f * dU), uv.y)).r * 0.09f;
+				s += tex2D(_ShadowMap, float2(uv.x - (2.0f * dU), uv.y)).r * 0.12f;
+				s += tex2D(_ShadowMap, float2(uv.x - (1.0f * dU), uv.y)).r * 0.15f;
+
+				s += center * 0.16f;
+
+				s += tex2D(_ShadowMap, float2(uv.x + (1.0f * dU), uv.y)).r * 0.15f;
+				s += tex2D(_ShadowMap, float2(uv.x + (2.0f * dU), uv.y)).r * 0.12f;
+				s += tex2D(_ShadowMap, float2(uv.x + (3.0f * dU), uv.y)).r * 0.09f;
+				s += tex2D(_ShadowMap, float2(uv.x + (4.0f * dU), uv.y)).r * 0.05f;
 
                 return fixed4(s,s,s,s);
             }

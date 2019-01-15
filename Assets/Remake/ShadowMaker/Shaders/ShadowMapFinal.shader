@@ -55,7 +55,7 @@ Shader "ShadowMaker/ShadowMapFinal"
                 }
 
 				// Apply depth bias.
-				s += DEPTH_BIAS;
+				//s += DEPTH_BIAS;
 
                 return fixed4(s,s,s,s);
             }

@@ -29,7 +29,7 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalBlurRenderTexture;
 
-        public const int SHADOWMAP_RESOLUTION = 640;
+        public const int SHADOWMAP_RESOLUTION = 1024;
 
         // --- LIGHTEMITTER --- //
         public const int EMITTER_COUNT_MAX = 64;
