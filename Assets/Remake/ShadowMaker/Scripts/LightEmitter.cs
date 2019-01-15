@@ -44,8 +44,6 @@ namespace ShadowMaker
 
         public float mRadius = 0.5f;
 
-        private bool ditryQuad = true;
-
         private void Awake()
         {
             this.propertyBlock = new MaterialPropertyBlock();
@@ -75,14 +73,14 @@ namespace ShadowMaker
 
         private void GizmosDrawArc(float alpha)
         {
-            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y) * 0.5f;
+            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y);
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
             UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, radius);
         }
 
         private void GizmosDrawCircle(float alpha)
         {
-            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y) * 0.5f;
+            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y);
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
             UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, radius);
         }
@@ -93,11 +91,6 @@ namespace ShadowMaker
             Gizmos.DrawIcon(this.transform.position, "Light Icon", true);
         }
 #endif
-
-        private void OnValidate()
-        {
-            this.ditryQuad = true;
-        }
 
         private void OnEnable()
         {
@@ -111,7 +104,12 @@ namespace ShadowMaker
 
         private void OnWillRenderObject()
         {
-            RebuildQuad();
+            //float maxScale = Mathf.Max(transform.localScale.x, transform.localScale.y);
+            //transform.localScale = new Vector3(maxScale, maxScale, 1.0f);
+
+            //RebuildQuad();
+
+            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh();
         }
 
         public float Angle
@@ -137,67 +135,26 @@ namespace ShadowMaker
                 if (mSpread != value)
                 {
                     mSpread = value;
-                    this.ditryQuad = true;
                 }
+            }
+        }
+
+        public float LightScale
+        {
+            get
+            {
+                return Mathf.Max(transform.localScale.x, transform.localScale.y);
             }
         }
 
         public void Start()
         {
-            mRadius = Mathf.Max(transform.localScale.x, transform.localScale.y) * 0.5f;
+            //mRadius = Mathf.Max(transform.localScale.x, transform.localScale.y) * 0.5f;
+            //mRadius = 2.5f;
 
-            transform.localScale = Vector3.one;
+            //transform.localScale = Vector3.one;
 
             //RebuildQuad();
-        }
-
-        /// <summary>
-        /// Build the light's quad mesh. This aims to fit the light cone as best as possible.
-        /// 
-        /// </summary>
-        public void RebuildQuad()
-        {
-            if (!ditryQuad)
-            {
-                return;
-            }
-
-            Mesh m = new Mesh();// GetComponent<MeshFilter>().mesh;
-
-            List<Vector3> verts = new List<Vector3>();
-
-            if (mSpread > 180.0f)
-            {
-                verts.Add(new Vector3(-mRadius, -mRadius));
-                verts.Add(new Vector3(+mRadius, +mRadius));
-                verts.Add(new Vector3(+mRadius, -mRadius));
-                verts.Add(new Vector3(-mRadius, +mRadius));
-            }
-            else
-            {
-                float radius = mRadius;
-
-                float minAngle = -mSpread * 0.5f;
-                float maxAngle = +mSpread * 0.5f;
-
-                Bounds aabb = new Bounds(Vector3.zero, Vector3.zero);
-                aabb.Encapsulate(new Vector3(radius, 0.0f));
-                aabb.Encapsulate(new Vector3(Mathf.Cos(Mathf.Deg2Rad * minAngle), Mathf.Sin(Mathf.Deg2Rad * minAngle)) * radius);
-                aabb.Encapsulate(new Vector3(Mathf.Cos(Mathf.Deg2Rad * maxAngle), Mathf.Sin(Mathf.Deg2Rad * maxAngle)) * radius);
-
-                verts.Add(new Vector3(aabb.min.x, aabb.min.y));
-                verts.Add(new Vector3(aabb.max.x, aabb.max.y));
-                verts.Add(new Vector3(aabb.max.x, aabb.min.y));
-                verts.Add(new Vector3(aabb.min.x, aabb.max.y));
-            }
-
-            m.SetVertices(verts);
-
-            m.SetTriangles(new int[6] { 0, 3, 1, 0, 1, 2 }, 0);
-
-            GetComponent<MeshFilter>().mesh = m;
-
-            this.ditryQuad = false;
         }
 
         public MaterialPropertyBlock BindShadowMap(RenderTexture shadowMapTexture)
@@ -211,7 +168,7 @@ namespace ShadowMaker
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
-            float radius = mRadius;
+            float radius = mRadius * 5 * 2;
 
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
