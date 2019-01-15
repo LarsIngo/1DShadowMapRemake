@@ -35,9 +35,6 @@ namespace ShadowMaker
 
         public Color mColour;
 
-        [Range(0, 360)]
-        public float mAngle = 0;
-
         [Range(0,360)]
         public float mSpread = 180;
 
@@ -121,16 +118,11 @@ namespace ShadowMaker
         {
             get
             {
-                return mAngle;
+                return transform.localRotation.eulerAngles.z;
             }
             set
             {
-                if (mAngle != value)
-                {
-                    mAngle = value;
-
-                    transform.localRotation = Quaternion.Euler(0.0f, 0.0f, mAngle);
-                }
+                transform.localRotation = Quaternion.Euler(0.0f, 0.0f, value);
             }
         }
 
@@ -212,7 +204,9 @@ namespace ShadowMaker
         {
             Vector4 shadowMapParams = LightEmitter.GetShadowMapParams(this.shadowMapSlot);
 
-            this.propertyBlock.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mAngle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f));
+            float angle = this.Angle;
+
+            this.propertyBlock.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f));
             this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
@@ -221,7 +215,7 @@ namespace ShadowMaker
 
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
-            mat.SetVector("_Params2", new Vector4(mAngle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
+            mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
             mat.SetVector("_ShadowMapParams", shadowMapParams);
             mat.SetTexture("_ShadowTex", shadowMapTexture);
 
