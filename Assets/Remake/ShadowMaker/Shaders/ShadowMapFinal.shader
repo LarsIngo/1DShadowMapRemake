@@ -29,7 +29,7 @@ Shader "ShadowMaker/ShadowMapFinal"
             #include "UnityCG.cginc"
             #include "ShadowMap1D.cginc"
 
-			#define DEPTH_BIAS 0.0005f
+			#define DEPTH_BIAS 0.001f
             
             struct appdata_t
             {
@@ -55,7 +55,7 @@ Shader "ShadowMaker/ShadowMapFinal"
                 }
 
 				// Apply depth bias.
-				//s += DEPTH_BIAS;
+				s += DEPTH_BIAS;
 
                 return fixed4(s,s,s,s);
             }
