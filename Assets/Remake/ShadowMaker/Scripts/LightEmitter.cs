@@ -116,7 +116,7 @@ namespace ShadowMaker
             this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
             this.propertyBlock.SetVector("_LightRadius", new Vector4(this.Radius, 0, 0, 0));
 
-            Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
+            Material mat = this.gameObject.GetComponent<MeshRenderer>().material;
 
             float radius = this.Radius;
 
