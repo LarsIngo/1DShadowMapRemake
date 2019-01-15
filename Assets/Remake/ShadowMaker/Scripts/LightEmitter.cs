@@ -47,6 +47,8 @@ namespace ShadowMaker
 
         public float mRadius = 0.5f;
 
+        private bool ditryQuad = true;
+
         private void Awake()
         {
             this.propertyBlock = new MaterialPropertyBlock();
@@ -60,9 +62,52 @@ namespace ShadowMaker
             }
         }
 
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            GizmosDrawIcon();
+
+            if (!Application.isPlaying)
+            {
+                GizmosDrawArc(0.25f);
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            GizmosDrawIcon();
+
+            if (!Application.isPlaying)
+            {
+                GizmosDrawArc(1.0f);
+                GizmosDrawCircle(1.0f);
+            }
+        }
+
+        private void GizmosDrawArc(float alpha)
+        {
+            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y) * 0.5f;
+            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
+            UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, radius);
+        }
+
+        private void GizmosDrawCircle(float alpha)
+        {
+            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y) * 0.5f;
+            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
+            UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, radius);
+        }
+
+        private void GizmosDrawIcon()
+        {
+            Gizmos.color = new Color(0,1,0,1);
+            Gizmos.DrawIcon(this.transform.position, "Light Icon", true);
+        }
+#endif
+
         private void OnValidate()
         {
-            this.RebuildQuad();
+            this.ditryQuad = true;
         }
 
         private void OnEnable()
@@ -75,8 +120,9 @@ namespace ShadowMaker
             LightEmitter.RemoveEmitter(this);
         }
 
-        private void OnDestroy()
+        private void OnWillRenderObject()
         {
+            RebuildQuad();
         }
 
         public float Angle
@@ -107,7 +153,7 @@ namespace ShadowMaker
                 if (mSpread != value)
                 {
                     mSpread = value;
-                    RebuildQuad();
+                    this.ditryQuad = true;
                 }
             }
         }
@@ -118,7 +164,7 @@ namespace ShadowMaker
 
             transform.localScale = Vector3.one;
 
-            RebuildQuad();
+            //RebuildQuad();
         }
 
         /// <summary>
@@ -127,8 +173,12 @@ namespace ShadowMaker
         /// </summary>
         public void RebuildQuad()
         {
-            Mesh m = GetComponent<MeshFilter>().sharedMesh;
-            m = m ?? new Mesh();
+            if (!ditryQuad)
+            {
+                return;
+            }
+
+            Mesh m = new Mesh();// GetComponent<MeshFilter>().mesh;
 
             List<Vector3> verts = new List<Vector3>();
 
@@ -158,6 +208,12 @@ namespace ShadowMaker
             }
 
             m.SetVertices(verts);
+
+            m.SetTriangles(new int[6] { 0, 3, 1, 0, 1, 2 }, 0);
+
+            GetComponent<MeshFilter>().mesh = m;
+
+            this.ditryQuad = false;
         }
 
         public MaterialPropertyBlock BindShadowMap(RenderTexture shadowMapTexture)
