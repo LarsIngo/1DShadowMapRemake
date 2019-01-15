@@ -51,30 +51,30 @@ Shader "ShadowMaker/ShadowMapFinalBlur"
 				return tex2D(_ShadowMap, IN.texcoords);
 			    // TMP
 
-				float2 uv = IN.texcoords;
+				//float2 uv = IN.texcoords;
 
-				// The depth of current fragment.
-				float center = tex2D(_ShadowMap, uv).r;
+				//// The depth of current fragment.
+				//float center = tex2D(_ShadowMap, uv).r;
 
-				// Fragment width in UV-space. Offset scales with depth.
-				float dU = _Params.x * smoothstep(0.0f, 1.0f, center);
+				//// Fragment width in UV-space. Offset scales with depth.
+				//float dU = _Params.x * smoothstep(0.0f, 1.0f, center);
 
-				// Gussian blur.
-				float s = 0.0f;
+				//// Gussian blur.
+				//float s = 0.0f;
 
-				s += tex2D(_ShadowMap, float2(uv.x - (4.0f * dU), uv.y)).r * 0.05f;
-				s += tex2D(_ShadowMap, float2(uv.x - (3.0f * dU), uv.y)).r * 0.09f;
-				s += tex2D(_ShadowMap, float2(uv.x - (2.0f * dU), uv.y)).r * 0.12f;
-				s += tex2D(_ShadowMap, float2(uv.x - (1.0f * dU), uv.y)).r * 0.15f;
+				//s += tex2D(_ShadowMap, float2(uv.x - (4.0f * dU), uv.y)).r * 0.05f;
+				//s += tex2D(_ShadowMap, float2(uv.x - (3.0f * dU), uv.y)).r * 0.09f;
+				//s += tex2D(_ShadowMap, float2(uv.x - (2.0f * dU), uv.y)).r * 0.12f;
+				//s += tex2D(_ShadowMap, float2(uv.x - (1.0f * dU), uv.y)).r * 0.15f;
 
-				s += center * 0.16f;
+				//s += center * 0.16f;
 
-				s += tex2D(_ShadowMap, float2(uv.x + (1.0f * dU), uv.y)).r * 0.15f;
-				s += tex2D(_ShadowMap, float2(uv.x + (2.0f * dU), uv.y)).r * 0.12f;
-				s += tex2D(_ShadowMap, float2(uv.x + (3.0f * dU), uv.y)).r * 0.09f;
-				s += tex2D(_ShadowMap, float2(uv.x + (4.0f * dU), uv.y)).r * 0.05f;
+				//s += tex2D(_ShadowMap, float2(uv.x + (1.0f * dU), uv.y)).r * 0.15f;
+				//s += tex2D(_ShadowMap, float2(uv.x + (2.0f * dU), uv.y)).r * 0.12f;
+				//s += tex2D(_ShadowMap, float2(uv.x + (3.0f * dU), uv.y)).r * 0.09f;
+				//s += tex2D(_ShadowMap, float2(uv.x + (4.0f * dU), uv.y)).r * 0.05f;
 
-                return fixed4(s,s,s,s);
+    //            return fixed4(s,s,s,s);
             }
 			ENDCG
         }

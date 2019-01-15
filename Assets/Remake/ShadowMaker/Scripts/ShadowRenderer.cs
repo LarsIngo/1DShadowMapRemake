@@ -29,7 +29,7 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalBlurRenderTexture;
 
-        public const int SHADOWMAP_RESOLUTION = 1024;
+        public const int SHADOWMAP_RESOLUTION = 64;
 
         // --- LIGHTEMITTER --- //
         public const int EMITTER_COUNT_MAX = 64;
@@ -189,7 +189,7 @@ namespace ShadowMaker
 
                 this.commandBuffer.Clear();
                 this.commandBuffer.SetRenderTarget(this.shadowMapInitialRenderTexture);
-                this.commandBuffer.ClearRenderTarget(true, true, new Color(1, 1, 1, 1), 1.0f);
+                this.commandBuffer.ClearRenderTarget(true, true, new Color(1, 1, 1, 1));
 
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)

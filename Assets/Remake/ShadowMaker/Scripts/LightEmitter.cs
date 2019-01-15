@@ -114,6 +114,7 @@ namespace ShadowMaker
 
             this.propertyBlock.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f));
             this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
+            this.propertyBlock.SetVector("_LightRadius", new Vector4(this.Radius, 0, 0, 0));
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -122,6 +123,7 @@ namespace ShadowMaker
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
             mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
+            mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
             mat.SetVector("_ShadowMapParams", shadowMapParams);
             mat.SetTexture("_ShadowTex", shadowMapTexture);
 
