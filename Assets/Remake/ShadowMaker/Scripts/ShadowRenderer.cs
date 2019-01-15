@@ -28,12 +28,6 @@ namespace ShadowMaker
         public const int EMITTER_COUNT_MAX = 64;
 
         private static ulong emitterAllocMask = 0;
-
-        // --- DEPTH --- //
-        [SerializeField] // TODO use Custom Editor.
-        private RenderTexture depthRenderTexture;
-
-        private Material depthMaterial;
         
         // --- Utility --- //
         public static int AllocateEmitterSlot()
@@ -118,12 +112,8 @@ namespace ShadowMaker
 
             // Final shadow map in range 0-360.
             this.shadowMapFinalMaterial = Resources.Load<Material>("ShadowMapFinalMaterial");
-            this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.ARGBHalf, RenderTextureReadWrite.Default);
+            this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
-
-            // TMP render depth.
-            this.depthMaterial = Resources.Load<Material>("DepthMaterial");
-            this.depthRenderTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.Depth, RenderTextureReadWrite.Default);
         }
 
         private void OnPreRender()
@@ -150,17 +140,6 @@ namespace ShadowMaker
                 this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
                 this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
                 this.commandBuffer.DrawMesh(this.screenQuadMesh, Matrix4x4.identity, this.shadowMapFinalMaterial);
-
-                // TMP render depth.
-                this.commandBuffer.SetRenderTarget(this.depthRenderTexture);
-                this.commandBuffer.ClearRenderTarget(true, true, new Color(1, 1, 1, 1), 1.0f);
-                List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
-                foreach (LightBlocker blocker in blockers)
-                {
-                    Mesh mesh = blocker.GetMesh();
-                    Matrix4x4 matrix = blocker.transform.localToWorldMatrix;
-                    this.commandBuffer.DrawMesh(mesh, matrix, depthMaterial, 0, -1);
-                }
             }
         }
 
