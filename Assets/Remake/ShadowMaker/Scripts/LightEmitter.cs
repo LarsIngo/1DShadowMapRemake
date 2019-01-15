@@ -158,14 +158,14 @@ namespace ShadowMaker
         private void OnDrawGizmos()
         {
             GizmosDrawIcon();
-            GizmosDrawArc(0.25f);
+            GizmosDrawArc(0.05f);
         }
 
         private void OnDrawGizmosSelected()
         {
             GizmosDrawIcon();
-            GizmosDrawArc(1.0f);
-            GizmosDrawCircle(1.0f);
+            GizmosDrawArc(0.20f);
+            GizmosDrawCircle(0.40f);
         }
 
         private void GizmosDrawArc(float alpha)
