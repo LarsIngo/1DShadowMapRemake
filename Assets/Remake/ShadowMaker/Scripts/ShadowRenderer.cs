@@ -29,7 +29,7 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalBlurRenderTexture;
 
-        public const int SHADOWMAP_RESOLUTION = 64;
+        public const int SHADOWMAP_RESOLUTION = 1024;
 
         // --- LIGHTEMITTER --- //
         public const int EMITTER_COUNT_MAX = 64;
@@ -161,6 +161,7 @@ namespace ShadowMaker
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapInitialRenderTexture.wrapMode = TextureWrapMode.Repeat;
             this.shadowMapInitialRenderTexture.anisoLevel = 0;
+            this.shadowMapInitialRenderTexture.autoGenerateMips = false;
 
             // Final shadow map in range 0-360.
             this.shadowMapFinalMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinal"));
@@ -169,6 +170,7 @@ namespace ShadowMaker
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapFinalRenderTexture.wrapMode = TextureWrapMode.Repeat;
             this.shadowMapFinalRenderTexture.anisoLevel = 0;
+            this.shadowMapFinalRenderTexture.autoGenerateMips = false;
 
             // Blurred final shadow map in range 0-360.
             this.shadowMapFinalBlurMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinalBlur"));
@@ -177,6 +179,7 @@ namespace ShadowMaker
             this.shadowMapFinalBlurRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapFinalBlurRenderTexture.wrapMode = TextureWrapMode.Repeat;
             this.shadowMapFinalBlurRenderTexture.anisoLevel = 0;
+            this.shadowMapFinalBlurRenderTexture.autoGenerateMips = false;
         }
 
         private void OnPreRender()
@@ -194,7 +197,7 @@ namespace ShadowMaker
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
                 {
-                    MaterialPropertyBlock properties = emitter.BindShadowMap(this.shadowMapFinalBlurRenderTexture);
+                    MaterialPropertyBlock properties = emitter.BindShadowMap(this.shadowMapFinalRenderTexture, this.shadowMapFinalBlurRenderTexture);
                     if (properties != null)
                     {
                         this.commandBuffer.DrawMesh(lightBlockerMesh, Matrix4x4.identity, this.shadowMapInitialMaterial, 0, -1, properties);

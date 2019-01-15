@@ -106,7 +106,7 @@ namespace ShadowMaker
             }
         }
 
-        public MaterialPropertyBlock BindShadowMap(RenderTexture shadowMapTexture)
+        public MaterialPropertyBlock BindShadowMap(Texture shadowMap, Texture shadowMapBlurred)
         {
             Vector4 shadowMapParams = LightEmitter.GetShadowMapParams(this.shadowMapSlot);
 
@@ -125,7 +125,8 @@ namespace ShadowMaker
             mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
             mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
             mat.SetVector("_ShadowMapParams", shadowMapParams);
-            mat.SetTexture("_ShadowTex", shadowMapTexture);
+            mat.SetTexture("_ShadowMap", shadowMap);
+            mat.SetTexture("_ShadowMapBlurred", shadowMapBlurred);
 
             return this.propertyBlock;
         }

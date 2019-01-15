@@ -527,9 +527,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mColour: {r: 0.88235295, g: 0.20761244, b: 0.20761244, a: 0}
-  mSpread: 360
+  mSpread: 315
   mFalloffExponent: 1
-  mAngleFalloffExponent: 0
+  mAngleFalloffExponent: 1
   mFullBrightRadius: 0
 --- !u!4 &871308409
 Transform:

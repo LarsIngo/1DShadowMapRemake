@@ -2,7 +2,8 @@ Shader "ShadowMaker/LightEmitter"
 {
 	Properties
 	{
-		[PerRendererData] _ShadowTex ("Texture", 2D) = "white" {}
+		[PerRendererData] _ShadowMap ("Texture", 2D) = "white" {}
+		[PerRendererData] _ShadowMapBlurred ("Texture", 2D) = "white" {}
 		[PerRendererData] _Color ("Color", Color) = (1,1,1,1)
 		[PerRendererData] _LightPosition("LightPosition", Vector) = (0,0,1,0)
 		[PerRendererData] _ShadowMapParams("ShadowMapParams", Vector) = (0,0,0,0)
@@ -56,7 +57,8 @@ Shader "ShadowMaker/LightEmitter"
 				return OUT;
 			}
 
-			sampler2D 	_ShadowTex;
+			sampler2D 	_ShadowMap;
+			sampler2D 	_ShadowMapBlurred;
 			float4 		_LightPosition;
 			float4 		_ShadowMapParams;
 			float4 		_Params2;
@@ -70,18 +72,20 @@ Shader "ShadowMaker/LightEmitter"
 				float4 lightPosition = _LightPosition;
 				float shadowMapParams = _ShadowMapParams.x;
 				float4 params2 = _Params2;
+				float lightRadius = _LightRadius.x;
 
 				// Angle and distance.
 				float2 polar = ToPolar(IN.worldPos.xy, lightPosition.xy);
 
-				float pixelDistance = polar.y / _LightRadius.x; // Covert from world to light radius space.
-				float u = (polar.x / 3.14f + 1.0f) * 0.5f; // [0-1] // Converts from polar angle to shadow map u-coordinate.
-				float s = tex2D(_ShadowTex, float2(u, shadowMapParams)).r; // [0-1]
+				float pixelDistance = polar.y / lightRadius; // Covert from world to light radius space.
+				float u = (polar.x / UNITY_PI + 1.0f) * 0.5f; // [0-1] // Converts from polar angle to shadow map u-coordinate.
+				float shadowMapDistance = tex2D(_ShadowMap, float2(u, shadowMapParams)).r; // [0-1]
+				float shadowMapBlurredDistance = tex2D(_ShadowMapBlurred, float2(u, shadowMapParams)).r; // [0-1] // TODO use this to make soft edges.
 
-				float lightFactor = pixelDistance < s ? 1.0f : 0.0f; // Whether pixel is not in shadow.
+				float lightFactor = pixelDistance < shadowMapDistance ? 1.0f : 0.0f; // Whether pixel is not in shadow.
 				
-				float distFalloff = max(0.0f,length(IN.worldPos.xy- lightPosition.xy) - params2.w) * params2.z;
-				distFalloff = clamp(distFalloff,0.0f,1.0f);
+				float distFalloff = max(0.0f, length(IN.worldPos.xy - lightPosition.xy) - params2.w) * params2.z;
+				distFalloff = clamp(distFalloff, 0.0f, 1.0f);
 				distFalloff = pow(1.0f - distFalloff, lightPosition.z);
 
 				float angleFalloff = AngleDiff(polar.x, params2.x) / params2.y;
