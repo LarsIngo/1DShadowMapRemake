@@ -24,6 +24,11 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalRenderTexture;
 
+        private Material shadowMapFinalBlurMaterial;
+
+        [SerializeField] // TODO use Custom Editor.
+        private RenderTexture shadowMapFinalBlurRenderTexture;
+
         public const int SHADOWMAP_RESOLUTION = 640;
 
         // --- LIGHTEMITTER --- //
@@ -154,12 +159,24 @@ namespace ShadowMaker
             ////this.shadowMapInitialMaterial.renderQueue = (int)RenderQueue.Geometry; // 2000
             this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAP_RESOLUTION * 1.5f), EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
+            this.shadowMapInitialRenderTexture.wrapMode = TextureWrapMode.Repeat;
+            this.shadowMapInitialRenderTexture.anisoLevel = 0;
 
             // Final shadow map in range 0-360.
             this.shadowMapFinalMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinal"));
             ////this.shadowMapFinalMaterial.renderQueue = (int)RenderQueue.Transparent; // 3000
             this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
+            this.shadowMapFinalRenderTexture.wrapMode = TextureWrapMode.Repeat;
+            this.shadowMapFinalRenderTexture.anisoLevel = 0;
+
+            // Blurred final shadow map in range 0-360.
+            this.shadowMapFinalBlurMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinalBlur"));
+            ////this.shadowMapFinalMaterial.renderQueue = (int)RenderQueue.Transparent; // 3000
+            this.shadowMapFinalBlurRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
+            this.shadowMapFinalBlurRenderTexture.filterMode = FilterMode.Point;
+            this.shadowMapFinalBlurRenderTexture.wrapMode = TextureWrapMode.Repeat;
+            this.shadowMapFinalBlurRenderTexture.anisoLevel = 0;
         }
 
         private void OnPreRender()
@@ -177,7 +194,7 @@ namespace ShadowMaker
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
                 {
-                    MaterialPropertyBlock properties = emitter.BindShadowMap(this.shadowMapFinalRenderTexture);
+                    MaterialPropertyBlock properties = emitter.BindShadowMap(this.shadowMapFinalBlurRenderTexture);
                     if (properties != null)
                     {
                         this.commandBuffer.DrawMesh(lightBlockerMesh, Matrix4x4.identity, this.shadowMapInitialMaterial, 0, -1, properties);
@@ -188,6 +205,12 @@ namespace ShadowMaker
                 this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
                 this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
                 this.commandBuffer.DrawMesh(screenQuad, Matrix4x4.identity, this.shadowMapFinalMaterial);
+
+                // Blur shadow map.
+                this.shadowMapFinalBlurMaterial.SetTexture("_ShadowMap", this.shadowMapFinalRenderTexture);
+                this.shadowMapFinalBlurMaterial.SetVector("_Params", new Vector4(1.0f / SHADOWMAP_RESOLUTION, 0, 0, 0));
+                this.commandBuffer.SetRenderTarget(this.shadowMapFinalBlurRenderTexture);
+                this.commandBuffer.DrawMesh(screenQuad, Matrix4x4.identity, this.shadowMapFinalBlurMaterial);
             }
         }
 
