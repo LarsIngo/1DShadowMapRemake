@@ -33,16 +33,19 @@ namespace ShadowMaker
 
         private MaterialPropertyBlock propertyBlock;
 
-        public Color mColour;
+        public Color mColour = Color.cyan;
 
         [Range(0,360)]
         public float mSpread = 180;
 
+        [Range(0, 20)]
         public float mFalloffExponent = 1.0f;
-        public float mAngleFalloffExponent = 1.0f;
-        public float mFullBrightRadius = 0.0f;
 
-        public float mRadius = 0.5f;
+        [Range(0, 20)]
+        public float mAngleFalloffExponent = 1.0f;
+
+        [Range(0, 1)]
+        public float mFullBrightRadius = 0.0f;
 
         private void Awake()
         {
@@ -56,39 +59,6 @@ namespace ShadowMaker
                 meshRenderer.sharedMaterial = material;
             }
         }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            GizmosDrawIcon();
-            GizmosDrawArc(0.25f);
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            GizmosDrawIcon();
-            GizmosDrawArc(1.0f);
-            GizmosDrawCircle(1.0f);
-        }
-
-        private void GizmosDrawArc(float alpha)
-        {
-            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
-            UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, this.Radius);
-        }
-
-        private void GizmosDrawCircle(float alpha)
-        {
-            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
-            UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, this.Radius);
-        }
-
-        private void GizmosDrawIcon()
-        {
-            Gizmos.color = new Color(0,1,0,1);
-            Gizmos.DrawIcon(this.transform.position, "Light Icon", true);
-        }
-#endif
 
         private void OnEnable()
         {
@@ -184,5 +154,37 @@ namespace ShadowMaker
             }
         }
 
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            GizmosDrawIcon();
+            GizmosDrawArc(0.25f);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            GizmosDrawIcon();
+            GizmosDrawArc(1.0f);
+            GizmosDrawCircle(1.0f);
+        }
+
+        private void GizmosDrawArc(float alpha)
+        {
+            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
+            UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, this.Radius);
+        }
+
+        private void GizmosDrawCircle(float alpha)
+        {
+            UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
+            UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, this.Radius);
+        }
+
+        private void GizmosDrawIcon()
+        {
+            Gizmos.color = new Color(0, 1, 0, 1);
+            Gizmos.DrawIcon(this.transform.position, "Light Icon", true);
+        }
+#endif
     }
 }
