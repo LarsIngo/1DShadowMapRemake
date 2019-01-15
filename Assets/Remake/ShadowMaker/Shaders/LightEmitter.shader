@@ -71,19 +71,22 @@ Shader "ShadowMaker/LightEmitter"
 
 				float2 polar = ToPolar(IN.worldPos.xy, lightPosition.xy);
 
-				float pixelDistance = polar.y / _LightRadius.x; // [0-1]
+				float pixelDistance = polar.y / _LightRadius.x;
 				float u = (polar.x / 3.14f + 1.0f) * 0.5f; // [0-1] // Converts from polar angle to shadow map u-coordinate.
-				float s = tex2D(_ShadowTex, float2(u, _ShadowMapParams.x)).r; // [0-LightRadius]
+				float s = tex2D(_ShadowTex, float2(u, _ShadowMapParams.x)).r; // [0-1]
 
-				float wd = (1.0f - s) * _LightRadius.x;
+				float lightFactor = pixelDistance < s ? 1.0f : 0.0f;
 
-				return fixed4(s, s, s, 1);
+				//return fixed4(lightFactor, lightFactor, lightFactor, lightFactor);
+				//float wd = (1.0f - s) * _LightRadius.x;
 
-				float shadow = SampleShadowTexturePCF(_ShadowTex,polar,_ShadowMapParams.x);
-				if (shadow < 0.5f) {
-					clip( -1.0 );
-					return c;
-				}
+				//return fixed4(s, s, s, 1);
+
+				//float shadow = SampleShadowTexturePCF(_ShadowTex,polar,_ShadowMapParams.x);
+				//if (shadow < 0.5f) {
+				//	clip( -1.0 );
+				//	return c;
+				//}
 				
 				float distFalloff = max(0.0f,length(IN.worldPos.xy- lightPosition.xy) - _Params2.w) * _Params2.z;
 				distFalloff = clamp(distFalloff,0.0f,1.0f);
@@ -93,7 +96,7 @@ Shader "ShadowMaker/LightEmitter"
 				angleFalloff = clamp(angleFalloff, 0.0f, 1.0f);
 				angleFalloff = pow(1.0f - angleFalloff, lightPosition.w);
 
-				c.rgb *= distFalloff * angleFalloff;
+				c.rgb *= distFalloff * angleFalloff * lightFactor;
 
 				return c;
 			}

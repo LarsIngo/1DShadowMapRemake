@@ -87,7 +87,7 @@
 
             float4 frag(v2f i) : SV_Target
             {
-				float d = clamp(i.polar.y / _LightRadius.x, 0, 1);// i.polar.y / 100.0f;
+				float d = clamp(i.polar.y / _LightRadius.x, 0.0f, 1.0f);
 				return float4(d,d,d,d);
 
 				//return float4(0.5f, 0.5f, 0.5f, 0.5f);
