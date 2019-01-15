@@ -120,6 +120,8 @@ namespace ShadowMaker
 
         private void OnPreRender()
         {
+            Debug.Log("OnPreRender");
+
             Mesh lightBlockerMesh = ShadowRenderer.CreateLightBlockerMesh();
 
             if (lightBlockerMesh != null)
