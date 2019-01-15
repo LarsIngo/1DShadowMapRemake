@@ -51,11 +51,13 @@ namespace ShadowMaker
         {
             this.propertyBlock = new MaterialPropertyBlock();
 
-            //MeshRenderer meshRenderer = this.gameObject.GetComponent<MeshRenderer>();
-            //if (meshRenderer.sharedMaterial == null)
-            //{
-            //    meshRenderer.sharedMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/LightEmitter"));
-            //}
+            MeshRenderer meshRenderer = this.gameObject.GetComponent<MeshRenderer>();
+            if (meshRenderer.sharedMaterial == null)
+            {
+                Material material = new Material(ShadowRenderer.LoadShader("ShadowMaker/LightEmitter"));
+                ////material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Background; // 1000
+                meshRenderer.sharedMaterial = material;
+            }
         }
 
         private void OnValidate()
