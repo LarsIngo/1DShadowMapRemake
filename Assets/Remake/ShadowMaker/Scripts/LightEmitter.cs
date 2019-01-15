@@ -73,14 +73,14 @@ namespace ShadowMaker
 
         private void GizmosDrawArc(float alpha)
         {
-            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y);
+            float radius = this.transform.localScale.x;
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
             UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.mSpread * 0.5f) * this.transform.right, this.mSpread, radius);
         }
 
         private void GizmosDrawCircle(float alpha)
         {
-            float radius = Mathf.Max(this.transform.localScale.x, this.transform.localScale.y);
+            float radius = this.transform.localScale.x;
             UnityEditor.Handles.color = new Color(this.mColour.r, this.mColour.g, this.mColour.b, alpha);
             UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, radius);
         }
@@ -104,23 +104,16 @@ namespace ShadowMaker
 
         private void OnWillRenderObject()
         {
-            //float maxScale = Mathf.Max(transform.localScale.x, transform.localScale.y);
-            //transform.localScale = new Vector3(maxScale, maxScale, 1.0f);
-
-            //RebuildQuad();
-
             this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh();
+            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.transform.localScale.x;
+            this.transform.localScale = new Vector3(this.transform.localScale.x, yScale, 1.0f);
         }
 
         public float Angle
         {
             get
             {
-                return transform.localRotation.eulerAngles.z;
-            }
-            set
-            {
-                transform.localRotation = Quaternion.Euler(0.0f, 0.0f, value);
+                return transform.rotation.eulerAngles.z;
             }
         }
 
@@ -132,29 +125,8 @@ namespace ShadowMaker
             }
             set
             {
-                if (mSpread != value)
-                {
-                    mSpread = value;
-                }
+                mSpread = value;
             }
-        }
-
-        public float LightScale
-        {
-            get
-            {
-                return Mathf.Max(transform.localScale.x, transform.localScale.y);
-            }
-        }
-
-        public void Start()
-        {
-            //mRadius = Mathf.Max(transform.localScale.x, transform.localScale.y) * 0.5f;
-            //mRadius = 2.5f;
-
-            //transform.localScale = Vector3.one;
-
-            //RebuildQuad();
         }
 
         public MaterialPropertyBlock BindShadowMap(RenderTexture shadowMapTexture)
@@ -168,7 +140,7 @@ namespace ShadowMaker
 
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
 
-            float radius = mRadius * 5 * 2;
+            float radius = this.transform.lossyScale.x;
 
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
