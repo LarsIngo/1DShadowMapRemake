@@ -4,7 +4,7 @@
     {
         [PerRendererData] _LightPosition("LightPosition", Vector) = (0,0,0,0)
         [PerRendererData] _ShadowMapV("ShadowMapParams", Vector) = (0,0,0,0)
-		[PerRendererData] _LightRadius("LightRadius", Vector) = (0,0,0,0)
+        [PerRendererData] _LightRadius("LightRadius", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -24,7 +24,7 @@
 
             float4 _LightPosition;			// xy is the position, z is the angle in radians, w is half the viewcone in radians
             float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
-			float4 _LightRadius;			// x is the radius of the light.
+            float4 _LightRadius;			// x is the radius of the light.
 
             float Intersect(float2 lineOneStart, float2 lineOneEnd, float2 lineTwoStart, float2 lineTwoEnd)
             {
@@ -53,12 +53,12 @@
 
             v2f vert(appdata v)
             {
-				float2 lightPosition = _LightPosition.xy; // world position
+                float2 lightPosition = _LightPosition.xy; // world position
 
-				float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
-				float2 polar2 = ToPolar(v.vertex2.xy, lightPosition);
+                float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
+                float2 polar2 = ToPolar(v.vertex2.xy, lightPosition);
 
-				float angle1 = polar1.x;
+                float angle1 = polar1.x;
                 float angle2 = polar2.x;
 
                 v2f o;
@@ -71,11 +71,11 @@
                     float maxAngle = max(angle1, angle2);
                     if (angle1 == maxAngle)
                     {
-						angle1 = maxAngle + 2.0f * UNITY_PI - diff;
+                        angle1 = maxAngle + 2.0f * UNITY_PI - diff;
                     }
                     else
                     {
-						angle1 = maxAngle;
+                        angle1 = maxAngle;
                     }
                 }
 
@@ -87,20 +87,8 @@
 
             float4 frag(v2f i) : SV_Target
             {
-				float d = clamp(i.polar.y / _LightRadius.x, 0.0f, 1.0f);
-				return float4(d,d,d,d);
-
-				//return float4(0.5f, 0.5f, 0.5f, 0.5f);
-
-                //float angle = i.polar.x;
-                //if (AngleDiff(angle,_LightPosition.z) > _LightPosition.w)
-                //    return float4(0,0,0,0);
-
-                //float2 realEnd = _LightPosition.xy + float2(cos(angle) * 10, sin(angle) * 10);
-
-                //float t = Intersect(_LightPosition.xy, realEnd, i.edge.xy, i.edge.zw);
-
-                //return float4(t,t,t,t);
+                float dist = clamp(i.polar.y / _LightRadius.x, 0.0f, 1.0f);
+                return float4(dist, dist, dist, dist);
             }
             ENDCG
         }
