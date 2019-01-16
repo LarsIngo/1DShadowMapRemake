@@ -84,10 +84,11 @@ Shader "ShadowMaker/LightEmitter"
                 float u = _ShadowMapParams.x;
                 float shadowMapResolution = 1024.0f;
 
+				// Calculate polar coordinate.
                 float2 polar = ToPolar(i.worldPos.xy, lightPosition.xy);
 
                 // Caclulate shadow factor.
-                float shadowFactor = SampleShadowTexturePCF5(_ShadowMap, polar, u, shadowMapResolution);
+                float shadowFactor = SampleShadowTexturePCF9G(_ShadowMap, polar, u, shadowMapResolution);
                 
                 // Calculate distance fall off.
                 float distFalloff = max(0.0f, length(i.worldPos.xy - lightPosition.xy) - params2.w) * params2.z;
