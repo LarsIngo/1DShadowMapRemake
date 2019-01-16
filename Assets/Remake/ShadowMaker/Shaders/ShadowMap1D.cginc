@@ -1,13 +1,11 @@
-﻿// General functions for 1D shadow mapping
-//
-//
+﻿/// Converts vector from center to cartesian to polar coordinates.
 inline float2 ToPolar(float2 cartesian, float2 center)
 {
     float2 d = cartesian - center;
     return float2(atan2(d.y, d.x), length(d));
 }
 
-// convert from (-PI to +2PI) to (-1,+1)
+// Convert from (-PI, +2PI) to (-1, +1)
 // the 3PI range is the normal 2PI plus another PI to deal
 // with wrap around e.g if a span goes from say 350 to 10 degrees
 // (20 degrees shortest path) it would require splitting the span
@@ -16,14 +14,12 @@ inline float2 ToPolar(float2 cartesian, float2 center)
 // span go from 350-370 and then when sampling from 0-PI you must
 // also sample from 2PI to 3PI and take the min to resolve the
 // wraparound.
-inline float PolarAngleToClipSpace(float a)
+inline float PolarAngleToClipSpace(float angle)
 {
-    a += UNITY_PI;
-    a *= 2.0f/(UNITY_PI*3.0f);
-    a -= 1.0f;			
-    return a;
+	return (2.0f * (angle + UNITY_PI) / (3.0f * UNITY_PI)) - 1.0f;
 }
-// convert from (-PI to +PI) to (0,2/3)
+
+// Convert from (-PI, +PI) to (0, 2/3)
 // The final (1/3) is the wraparound as discussed above.
 // if the returned angle is < 1/3 you should sample
 // again with 2/3 added on and take the min.
@@ -31,6 +27,28 @@ inline float PolarAngleToU(float angle)
 {
     return (angle + UNITY_PI) / (2.0f * UNITY_PI);
 }
+
+// Returns the shortest angle arc between a and b (all angles in radians)
+inline float AngleDiff(float a, float b)
+{
+	float diff = fmod(abs(a - b), 2.0f * UNITY_PI);
+	if (diff > UNITY_PI)
+		diff = 2.0f * UNITY_PI - diff;
+
+	return diff;
+}
+
+inline float2 ClipSpaceToUV(float2 clipSpace)
+{
+#if UNITY_UV_STARTS_AT_TOP
+	float4 scale = float4(0.5f, 0.5f, 0.5f, 0.5f);
+#else
+	float4 scale = float4(0.5f, -0.5f, 0.5f, 0.5f);
+#endif
+
+	return clipSpace * scale.xy + scale.zw;
+}
+
 
 // Takes a single sample from the shadow texture.
 inline float SampleShadowTexturePCF0(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
@@ -130,25 +148,4 @@ inline float SampleShadowTexturePCF7(sampler2D textureSampler, float2 polar, flo
     total += step(polar.y, tex2D(textureSampler, float2(u7, v)).r * 10.0f);
 
     return total / 7.0f;
-}
-
-// Returns the shortest angle arc between a and b (all angles in radians)
-inline float AngleDiff(float a, float b)
-{
-    float diff = fmod(abs(a-b), 2.0f * UNITY_PI);
-    if (diff > UNITY_PI)
-        diff = 2.0f * UNITY_PI - diff;
-
-    return diff;
-}
-
-inline float2 ClipSpaceToUV(float2 clipSpace)
-{
-    #if UNITY_UV_STARTS_AT_TOP
-    float4 scale = float4(0.5f, 0.5f, 0.5f, 0.5f);
-    #else
-    float4 scale = float4(0.5f, -0.5f, 0.5f, 0.5f);
-    #endif
-
-    return clipSpace * scale.xy + scale.zw;
 }
