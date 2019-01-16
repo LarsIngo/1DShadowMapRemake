@@ -50,60 +50,79 @@
 			{
 				float4 vertex : SV_POSITION;
 				float4 edge   : TEXCOORD0;		// xy=edgeVertex1,yz=edgeVertex2
-				float2 polar  : TEXCOORD1;		// x=angle,y=none
+				float2 angle  : TEXCOORD1;		// x=angle,y=none
 			};
 
 			v2f vert(appdata v)
 			{
+				// Chache global memory.
 				float2 lightPosition = _LightPosition.xy;
 
+				// Convert vertices to polar coordinates.
 				float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
 				float2 polar2 = ToPolar(v.vertex2.xy, lightPosition);
 
+				// Get angles.
 				float angle1 = polar1.x;
 				float angle2 = polar2.x;
 
 				v2f o;
+
+				// Store edge.
 				o.edge = float4(v.vertex1.xy, v.vertex2.xy);
 				o.edge = lerp(o.edge, o.edge.zwxy, step(angle1, angle2));
 
+				// Check whether vertex edge was cut off.
 				float diff = abs(angle1 - angle2);
 				if (diff >= UNITY_PI)
 				{
-					float maxAngle = max(angle1, angle2);
-					if (angle1 == maxAngle)
-					{
-						angle1 = maxAngle + 2.0f * UNITY_PI - diff;
-					}
-					else
-					{
-						angle1 = maxAngle;
-					}
+					// Sign is used to reduce branching.
+					float factor = (sign(angle1 - angle2) + 1.0f) * 0.5f;
+					angle1 = max(angle1, angle2) + (2.0f * UNITY_PI - diff) * factor;
 				}
+				//float diff = abs(angle1 - angle2);
+				//if (diff >= UNITY_PI)
+				//{
+				//	float maxAngle = max(angle1, angle2);
+				//	if (angle1 == maxAngle)
+				//	{
+				//		angle1 = maxAngle + 2.0f * UNITY_PI - diff;
+				//	}
+				//	else
+				//	{
+				//		angle1 = maxAngle;
+				//	}
+				//}
 
+				// Convert vertex to clip space.
 				o.vertex = float4(PolarAngleToClipSpace(angle1), _ShadowMapParams.y, 0.0f, 1.0f);
 
-				o.polar = float2(angle1, polar1.y);
+				// Store angle.
+				o.angle = float2(angle1, 0.0f);
+
 				return o;
 			}
 
 			float4 frag(v2f i) : SV_Target
 			{
+				// Chache global memory.
 				float4 lightPosition = _LightPosition;
 				float lightRadius = _LightRadius.x;
 				
-				float angle = i.polar.x;
+				// Get angle.
+				float angle = i.angle.x;
 
 				// Check whether angle is outside spread of light.
 				//if (AngleDiff(angle, lightPosition.z) > lightPosition.w)
 				//	return float4(0,0,0,0);
 
-				// Caclulate postion of the light on the edge.
+				// Calculate postion of the light on the edge.
 				float2 lightEnd = lightPosition.xy + float2(cos(angle) * lightRadius, sin(angle) * lightRadius);
 
-				// Find intersection between light vector and edge.
+				// Find intersection between light vector and vertex edge.
 				float t = Intersect(lightPosition.xy, lightEnd, i.edge.xy, i.edge.zw);
 
+				// Return intersection scalar value.
 				return float4(t,t,t,t);
 			}
 			ENDCG
