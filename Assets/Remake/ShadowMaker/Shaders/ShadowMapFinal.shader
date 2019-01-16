@@ -49,6 +49,8 @@ Shader "ShadowMaker/ShadowMapFinal"
                 float u = i.texcoords.x * 2.0f / 3.0f;
                 float v = i.texcoords.y;
                 float s = tex2D(_ShadowMap, float2(u,v)).r;
+
+				// Check whether shadow map has to be sampled again.
                 if (u < 1.0f / 3.0f) 
                 {
                     s = min(s, tex2D(_ShadowMap, float2(u + (2.0f / 3.0f), v)).r);
@@ -57,7 +59,7 @@ Shader "ShadowMaker/ShadowMapFinal"
                 // Apply depth bias.
                 s += DEPTH_BIAS;
 
-                return fixed4(s,s,s,s);
+                return fixed4(s, s, s, s);
             }
             ENDCG
         }
