@@ -3,12 +3,12 @@ Shader "ShadowMaker/LightEmitter"
     Properties
     {
         [PerRendererData] _ShadowMap ("Texture", 2D) = "white" {}
-        [PerRendererData] _ShadowMapBlurred ("Texture", 2D) = "white" {}
         [PerRendererData] _Color ("Color", Color) = (1,1,1,1)
         [PerRendererData] _LightPosition("LightPosition", Vector) = (0,0,1,0)
         [PerRendererData] _ShadowMapParams("ShadowMapParams", Vector) = (0,0,0,0)
         [PerRendererData] _Params2("Params2", Vector) = (0,0,0,0)
         [PerRendererData] _LightRadius("LightRadius", Vector) = (0,0,0,0)
+		[PerRendererData] _ShadowMapResolution("ShadowMapResolution", Vector) = (0,0,0,0)
     }
 
     SubShader
@@ -45,16 +45,16 @@ Shader "ShadowMaker/LightEmitter"
             
             struct appdata_t
             {
-                float4 vertex   : POSITION;
+                float4 vertex    : POSITION;
                 float2 texcoords : TEXCOORD0;
             };
 
             struct v2f
             {
-                float4 vertex   : SV_POSITION;
+                float4 vertex    : SV_POSITION;
                 float2 texcoords : TEXCOORD0;
-                float4 modelPos : TEXCOORD1;
-                float4 worldPos : TEXCOORD2;
+                float4 modelPos  : TEXCOORD1;
+                float4 worldPos  : TEXCOORD2;
             };
             
             v2f vert(appdata_t i)
@@ -68,12 +68,12 @@ Shader "ShadowMaker/LightEmitter"
             }
 
             sampler2D 	_ShadowMap;
-            sampler2D 	_ShadowMapBlurred;
             float4 		_LightPosition;
             float4 		_ShadowMapParams;
             float4 		_Params2;
             float4      _LightRadius;
             fixed4 		_Color;
+			float4      _ShadowMapResolution;
             
             fixed4 frag(v2f i) : SV_Target
             {
@@ -82,7 +82,7 @@ Shader "ShadowMaker/LightEmitter"
                 float4 lightPosition = _LightPosition;
                 float4 params2 = _Params2;
                 float u = _ShadowMapParams.x;
-                float shadowMapResolution = 1024.0f;
+				float shadowMapResolution = _ShadowMapResolution.x;//1024.0f;
 				float lightRadius = _LightRadius.x;
 
 				// Calculate polar coordinate.
