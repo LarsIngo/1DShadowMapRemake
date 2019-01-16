@@ -50,7 +50,7 @@
 			{
 				float4 vertex : SV_POSITION;
 				float4 edge   : TEXCOORD0;		// xy=edgeVertex1,yz=edgeVertex2
-				float2 polar  : TEXCOORD1;		// x=angle,y=distance
+				float2 polar  : TEXCOORD1;		// x=angle,y=none
 			};
 
 			v2f vert(appdata v)
@@ -89,21 +89,20 @@
 
 			float4 frag(v2f i) : SV_Target
 			{
-				float2 lightPosition = _LightPosition.xy;
+				float4 lightPosition = _LightPosition;
 				float lightRadius = _LightRadius.x;
 				
 				float angle = i.polar.x;
-				float dist = i.polar.y;
 
-				float d = dist / lightRadius;
-				//return float4(d, d, d, d);
+				// Check whether angle is outside spread of light.
+				//if (AngleDiff(angle, lightPosition.z) > lightPosition.w)
+				//	return float4(0,0,0,0);
 
-				if (AngleDiff(angle,_LightPosition.z) > _LightPosition.w)
-					return float4(0,0,0,0);
+				// Caclulate postion of the light on the edge.
+				float2 lightEnd = lightPosition.xy + float2(cos(angle) * lightRadius, sin(angle) * lightRadius);
 
-				float2 realEnd = lightPosition + float2(cos(angle) * 10, sin(angle) * 10);
-
-				float t = Intersect(lightPosition, realEnd, i.edge.xy, i.edge.zw);
+				// Find intersection between light vector and edge.
+				float t = Intersect(lightPosition.xy, lightEnd, i.edge.xy, i.edge.zw);
 
 				return float4(t,t,t,t);
 			}

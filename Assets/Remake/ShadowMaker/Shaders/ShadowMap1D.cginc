@@ -51,14 +51,14 @@ inline float2 ClipSpaceToUV(float2 clipSpace)
 
 
 // Takes a single sample from the shadow texture.
-inline float SampleShadowTexturePCF0(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
+inline float SampleShadowTexturePCF0(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution, float lightRadius)
 {
     float u1 = PolarAngleToU(polar.x);
 
-    return step(polar.y, tex2D(textureSampler, float2(u1, v)).r * 10.0f);
+    return step(polar.y, tex2D(textureSampler, float2(u1, v)).r * lightRadius);
 }
 
-inline float SampleShadowTexturePCF3(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
+inline float SampleShadowTexturePCF3(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution, float lightRadius)
 {
     float u1 = PolarAngleToU(polar.x);
 
@@ -68,14 +68,14 @@ inline float SampleShadowTexturePCF3(sampler2D textureSampler, float2 polar, flo
     float u3 = u1 + 1.0f * dU;
 
     float total = 0.0f;
-    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * 10.0f);
+    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * lightRadius);
 
     return total / 3.0f;
 }
 
-inline float SampleShadowTexturePCF5(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
+inline float SampleShadowTexturePCF5(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution, float lightRadius)
 {
     float u1 = PolarAngleToU(polar.x);
 
@@ -87,16 +87,16 @@ inline float SampleShadowTexturePCF5(sampler2D textureSampler, float2 polar, flo
     float u5 = u1 + 2.0f * dU;
 
     float total = 0.0f;
-    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * 10.0f);
+    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * lightRadius);
 
     return total / 5.0f;
 }
 
-inline float SampleShadowTexturePCF9(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
+inline float SampleShadowTexturePCF9(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution, float lightRadius)
 {
     float u1 = PolarAngleToU(polar.x);
 
@@ -112,20 +112,20 @@ inline float SampleShadowTexturePCF9(sampler2D textureSampler, float2 polar, flo
     float u9 = u1 + 4.0f * dU;
 
     float total = 0.0f;
-    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u6, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u7, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u8, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u9, v)).r * 10.0f);
+    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u6, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u7, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u8, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u9, v)).r * lightRadius);
 
     return total / 9.0f;
 }
 
-inline float SampleShadowTexturePCF7(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
+inline float SampleShadowTexturePCF7(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution, float lightRadius)
 {
     float u1 = PolarAngleToU(polar.x);
 
@@ -139,13 +139,13 @@ inline float SampleShadowTexturePCF7(sampler2D textureSampler, float2 polar, flo
     float u7 = u1 + 3.0f * dU;
 
     float total = 0.0f;
-    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u6, v)).r * 10.0f);
-    total += step(polar.y, tex2D(textureSampler, float2(u7, v)).r * 10.0f);
+    total += step(polar.y, tex2D(textureSampler, float2(u1, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u2, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u3, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u4, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u5, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u6, v)).r * lightRadius);
+    total += step(polar.y, tex2D(textureSampler, float2(u7, v)).r * lightRadius);
 
     return total / 7.0f;
 }
