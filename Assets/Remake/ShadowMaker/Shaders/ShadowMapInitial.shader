@@ -26,18 +26,6 @@
             float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
             float4 _LightRadius;			// x is the radius of the light.
 
-            float Intersect(float2 lineOneStart, float2 lineOneEnd, float2 lineTwoStart, float2 lineTwoEnd)
-            {
-                float2 line2Perp = float2(lineTwoEnd.y - lineTwoStart.y, lineTwoStart.x - lineTwoEnd.x);
-                float line1Proj = dot(lineOneEnd - lineOneStart, line2Perp);
-
-                if (abs(line1Proj) < 1e-4)
-                    return 0.0f;
-
-                float t1 = dot(lineTwoStart - lineOneStart,line2Perp) / line1Proj;
-                return t1;
-            }
-
             struct appdata
             {
                 float3 vertex1 : POSITION;
