@@ -54,7 +54,6 @@ inline float SampleShadow1TapPreOptimise(sampler2D textureSampler, float u, floa
 	return sample;
 }
 
-
 // Takes a single sample from the shadow texture.
 inline float SampleShadow1Tap(sampler2D textureSampler, float u, float v)
 {

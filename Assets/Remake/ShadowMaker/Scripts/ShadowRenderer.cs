@@ -192,7 +192,7 @@ namespace ShadowMaker
 
                 this.commandBuffer.Clear();
                 this.commandBuffer.SetRenderTarget(this.shadowMapInitialRenderTexture);
-                this.commandBuffer.ClearRenderTarget(true, true, new Color(1, 1, 1, 1));
+                this.commandBuffer.ClearRenderTarget(false, true, new Color(1, 1, 1, 1));
 
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
@@ -215,10 +215,6 @@ namespace ShadowMaker
                 this.commandBuffer.SetRenderTarget(this.shadowMapFinalBlurRenderTexture);
                 this.commandBuffer.DrawMesh(screenQuad, Matrix4x4.identity, this.shadowMapFinalBlurMaterial);
             }
-        }
-
-        private void OnPostRender()
-        {
         }
 
         // Create a mesh containing all the light blocker edges

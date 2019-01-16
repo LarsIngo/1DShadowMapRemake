@@ -1,5 +1,4 @@
-﻿
-// General functions for 1D shadow mapping
+﻿// General functions for 1D shadow mapping
 //
 //
 
@@ -62,27 +61,53 @@ inline float SampleShadow1Tap(sampler2D textureSampler, float u, float v)
     return sample;
 }
 
-inline float SampleShadowTexture(sampler2D textureSampler, float angle, float v)
+//inline float SampleShadowTexture(sampler2D textureSampler, float angle, float v)
+//{
+//    return SampleShadow1Tap(textureSampler,PolarAngleToShadowTextureLookup(angle),v);
+//}
+
+inline float SampleShadowTexturePCF3(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
 {
-    return SampleShadow1Tap(textureSampler,PolarAngleToShadowTextureLookup(angle),v);
+	float u1 = PolarAngleToShadowTextureLookup(polar.x);
+
+	float dU = 1.0f / shadowMapResolution;
+
+	float u2 = u1 - 1.0f * dU;
+	float u3 = u1 + 1.0f * dU;
+
+	float total = 0.0f;
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u1, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u2, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u3, v) * 10.0f);
+
+	return total / 3.0f;
 }
 
-inline float SampleShadowTexturePCF(sampler2D textureSampler, float2 samplePos, float v)
+inline float SampleShadowTexturePCF5(sampler2D textureSampler, float2 polar, float v, float shadowMapResolution)
 {
-    float u1 = PolarAngleToShadowTextureLookup(samplePos.x);
-        
-    //float u2 = u1-2*(1.0f/1024.0f);
-    float u3 = u1-1*(1.0f/1024.0f);
-    float u4 = u1+1*(1.0f/1024.0f);
-    //float u5 = u1+2*(1.0f/1024.0f);
+	float u1 = PolarAngleToShadowTextureLookup(polar.x);
 
-    float total = 0.0f;
-    total += step(samplePos.y,SampleShadow1Tap(textureSampler,u1,v) * 10);
-    //total += step(samplePos.y,SampleShadow1Tap(textureSampler,u2,v) * 10);
-    total += step(samplePos.y,SampleShadow1Tap(textureSampler,u3,v) * 10);
-    total += step(samplePos.y,SampleShadow1Tap(textureSampler,u4,v) * 10);
-    //total += step(samplePos.y,SampleShadow1Tap(textureSampler,u5,v) * 10);
-    return total / 3.0f;
+	float dU = 1.0f / shadowMapResolution;
+
+	float u2 = u1 - 2.0f * dU;
+	float u3 = u1 - 1.0f * dU;
+	float u4 = u1 + 1.0f * dU;
+	float u5 = u1 + 2.0f * dU;
+
+	float total = 0.0f;
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u1, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u2, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u3, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u4, v) * 10.0f);
+	total += step(polar.y, SampleShadow1Tap(textureSampler, u5, v) * 10.0f);
+
+	return total / 5.0f;
+}
+
+inline float SampleShadowTexture(sampler2D textureSampler, float2 samplePos, float v)
+{
+	float u = PolarAngleToShadowTextureLookup(samplePos.x);
+	return step(samplePos.y, SampleShadow1Tap(textureSampler, u, v) * 10);
 }
 
 // Returns the shortest angle arc between a and b (all angles in radians)

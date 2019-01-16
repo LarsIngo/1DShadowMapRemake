@@ -57,14 +57,14 @@ Shader "ShadowMaker/LightEmitter"
                 float4 worldPos : TEXCOORD2;
             };
             
-            v2f vert(appdata_t IN)
+            v2f vert(appdata_t i)
             {
-                v2f OUT;
-                OUT.vertex = UnityObjectToClipPos(IN.vertex);
-                OUT.texcoords = IN.texcoords;
-                OUT.modelPos = IN.vertex;
-                OUT.worldPos = mul(unity_ObjectToWorld, IN.vertex);
-                return OUT;
+                v2f o;
+                o.vertex = UnityObjectToClipPos(i.vertex);
+                o.texcoords = i.texcoords;
+                o.modelPos = i.vertex;
+                o.worldPos = mul(unity_ObjectToWorld, i.vertex);
+                return o;
             }
 
             sampler2D 	_ShadowMap;
@@ -75,27 +75,22 @@ Shader "ShadowMaker/LightEmitter"
             float4      _LightRadius;
             fixed4 		_Color;
             
-            fixed4 frag(v2f IN) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
+                // Cache global memory.
                 fixed4 c = _Color;
-
                 float4 lightPosition = _LightPosition;
-                float shadowMapParams = _ShadowMapParams.x;
                 float4 params2 = _Params2;
-                float lightRadius = _LightRadius.x;
+                float u = _ShadowMapParams.x;
+                float shadowMapResolution = 1024.0f;
 
-                // Angle and distance.
-                float2 polar = ToPolar(IN.worldPos.xy, lightPosition.xy);
+                float2 polar = ToPolar(i.worldPos.xy, lightPosition.xy);
 
-                // Calculate shadow map occulution.
-                float pixelDistance = polar.y / lightRadius; // Covert from world to light radius space.
-                float u = (polar.x / UNITY_PI + 1.0f) * 0.5f; // [0-1] // Converts from polar angle to shadow map u-coordinate.
-                float shadowMapDistance = tex2D(_ShadowMap, float2(u, shadowMapParams)).r; // [0-1]
-                float shadowMapBlurredDistance = tex2D(_ShadowMapBlurred, float2(u, shadowMapParams)).r; // [0-1] // TODO use this to make soft edges.
-                float shadowMapFactor = (sign(shadowMapDistance - pixelDistance) + 1.0f) * 0.5f; // Whether pixel is not in shadow.
+                // Caclulate shadow factor.
+                float shadowFactor = SampleShadowTexturePCF5(_ShadowMap, polar, u, shadowMapResolution);
                 
                 // Calculate distance fall off.
-                float distFalloff = max(0.0f, length(IN.worldPos.xy - lightPosition.xy) - params2.w) * params2.z;
+                float distFalloff = max(0.0f, length(i.worldPos.xy - lightPosition.xy) - params2.w) * params2.z;
                 distFalloff = clamp(distFalloff, 0.0f, 1.0f);
                 distFalloff = pow(1.0f - distFalloff, lightPosition.z);
 
@@ -105,14 +100,15 @@ Shader "ShadowMaker/LightEmitter"
                 angleFalloff = pow(1.0f - angleFalloff, lightPosition.w);
 
                 // Calculate color.
-                c.rgb *= distFalloff * angleFalloff * shadowMapFactor;
+                c.rgb *= distFalloff * angleFalloff * shadowFactor;
 
                 // Apply dithering in order to reduce banding.
-                float dither = DitherValue(IN.texcoords) * 2.0f;
+                float dither = DitherValue(i.texcoords);
                 c += float4(dither, dither, dither, dither);
 
                 return c;
             }
+
         ENDCG
         }
     }
