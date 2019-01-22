@@ -1,11 +1,5 @@
 ﻿Shader "ShadowMaker/ShadowMapInitial"
 {
-    Properties
-    {
-        [PerRendererData] _LightPosition("LightPosition", Vector) = (0,0,0,0)
-        [PerRendererData] _ShadowMapV("ShadowMapParams", Vector) = (0,0,0,0)
-        [PerRendererData] _LightRadius("LightRadius", Vector) = (0,0,0,0)
-    }
     SubShader
     {
         Cull Off
@@ -24,9 +18,10 @@
             #include "UnityCG.cginc"
             #include "ShadowMap1D.cginc"
 
-            float4 _LightPosition;			// xy is the position, z is the angle in radians, w is half the viewcone in radians
+			#define EMITTER_COUNT_MAX 64
+
+            float4 _EmitterParams;			// xy is the position, z is the angle in radians, w is the radius of the light.
             float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
-            float4 _LightRadius;			// x is the radius of the light.
 
 			float Intersect(float2 lineOneStart, float2 lineOneEnd, float2 lineTwoStart, float2 lineTwoEnd)
 			{
@@ -56,7 +51,7 @@
 			v2f vert(appdata v)
 			{
 				// Chache global memory.
-				float2 lightPosition = _LightPosition.xy;
+				float2 lightPosition = _EmitterParams.xy;
 
 				// Convert vertices to polar coordinates.
 				float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
@@ -106,8 +101,9 @@
 			float4 frag(v2f i) : SV_Target
 			{
 				// Chache global memory.
-				float4 lightPosition = _LightPosition;
-				float lightRadius = _LightRadius.x;
+				float4 emitterParams = _EmitterParams;
+				float2 lightPosition = emitterParams.xy;
+				float radius = emitterParams.w;
 				
 				// Get angle.
 				float angle = i.angle.x;
@@ -117,10 +113,10 @@
 				//	return float4(0,0,0,0);
 
 				// Calculate postion of the light on the edge.
-				float2 lightEnd = lightPosition.xy + float2(cos(angle) * lightRadius, sin(angle) * lightRadius);
+				float2 lightEnd = lightPosition + float2(cos(angle) * radius, sin(angle) * radius);
 
 				// Find intersection between light vector and vertex edge.
-				float t = Intersect(lightPosition.xy, lightEnd, i.edge.xy, i.edge.zw);
+				float t = Intersect(lightPosition, lightEnd, i.edge.xy, i.edge.zw);
 
 				// Return intersection scalar value.
 				return float4(t,t,t,t);

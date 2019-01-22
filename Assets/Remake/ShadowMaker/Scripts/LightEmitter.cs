@@ -111,15 +111,14 @@ namespace ShadowMaker
             Vector4 shadowMapParams = LightEmitter.GetShadowMapParams(this.shadowMapSlot);
 
             float angle = this.Angle;
-
-            this.propertyBlock.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f));
-            this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
-            this.propertyBlock.SetVector("_LightRadius", new Vector4(this.Radius, 0, 0, 0));
-
-            Material mat = this.gameObject.GetComponent<MeshRenderer>().material;
-
             float radius = this.Radius;
 
+            // ShadowMapInitial.shader
+            this.propertyBlock.SetVector("_EmitterParams", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, radius));
+            this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
+
+            // LightEmitter.shader
+            Material mat = this.gameObject.GetComponent<MeshRenderer>().material;
             mat.SetVector("_Color", mColour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
             mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
