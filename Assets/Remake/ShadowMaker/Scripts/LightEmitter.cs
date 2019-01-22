@@ -76,6 +76,18 @@ namespace ShadowMaker
             float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.Radius; // Calculate local y scale to fit spread and radius.
             float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
             this.transform.localScale = new Vector3(this.transform.localScale.x, Mathf.Max(yScale / parentScaleFactor, 0.001f), 1.0f); // Update scale in order to fit mesh to light spread and radius.
+
+            // LightEmitter.shader
+            float angle = this.Angle;
+            float radius = this.Radius;
+            Material mat = this.gameObject.GetComponent<MeshRenderer>().material;
+            mat.SetVector("_Color", mColour);
+            mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
+            mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
+            mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
+            mat.SetVector("_ShadowMapParams", LightEmitter.GetShadowMapParams(this.shadowMapSlot));
+            mat.SetTexture("_ShadowMap", ShadowRenderer.ShadowMapFinalRenderTexture);
+            mat.SetVector("_ShadowMapResolution", new Vector4(ShadowRenderer.SHADOWMAP_RESOLUTION, 0.0f, 0.0f, 0.0f));
         }
 
         public float Angle
@@ -106,26 +118,14 @@ namespace ShadowMaker
             }
         }
 
-        public MaterialPropertyBlock BindShadowMap(Texture shadowMap)
+        public MaterialPropertyBlock GetMaterialPropertyBlock()
         {
-            Vector4 shadowMapParams = LightEmitter.GetShadowMapParams(this.shadowMapSlot);
-
             float angle = this.Angle;
             float radius = this.Radius;
 
             // ShadowMapInitial.shader
             this.propertyBlock.SetVector("_EmitterParams", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, radius));
-            this.propertyBlock.SetVector("_ShadowMapParams", shadowMapParams);
-
-            // LightEmitter.shader
-            Material mat = this.gameObject.GetComponent<MeshRenderer>().material;
-            mat.SetVector("_Color", mColour);
-            mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, mFalloffExponent, mAngleFalloffExponent));
-            mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, mSpread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - mFullBrightRadius) * radius), mFullBrightRadius * radius));
-            mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
-            mat.SetVector("_ShadowMapParams", shadowMapParams);
-            mat.SetTexture("_ShadowMap", shadowMap);
-            mat.SetVector("_ShadowMapResolution", new Vector4(ShadowRenderer.SHADOWMAP_RESOLUTION, 0.0f, 0.0f, 0.0f));
+            this.propertyBlock.SetVector("_ShadowMapParams", LightEmitter.GetShadowMapParams(this.shadowMapSlot));
 
             return this.propertyBlock;
         }

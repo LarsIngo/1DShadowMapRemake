@@ -24,6 +24,14 @@ namespace ShadowMaker
         [SerializeField] // TODO use Custom Editor.
         private RenderTexture shadowMapFinalRenderTexture;
 
+        public static RenderTexture ShadowMapFinalRenderTexture
+        {
+            get
+            {
+                return UnityEngine.Object.FindObjectOfType<ShadowRenderer>().shadowMapFinalRenderTexture;
+            }
+        }
+
         public const int SHADOWMAP_RESOLUTION = 1024;
 
         // --- LIGHTEMITTER --- //
@@ -184,7 +192,7 @@ namespace ShadowMaker
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
                 {
-                    MaterialPropertyBlock properties = emitter.BindShadowMap(this.shadowMapFinalRenderTexture);
+                    MaterialPropertyBlock properties = emitter.GetMaterialPropertyBlock();
                     if (properties != null)
                     {
                         this.commandBuffer.DrawMesh(lightBlockerMesh, Matrix4x4.identity, this.shadowMapInitialMaterial, 0, -1, properties);
