@@ -160,6 +160,7 @@ namespace ShadowMaker
             // Initial shadow map in range 0-540.
             this.shadowMapInitialMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapInitial"));
             ////this.shadowMapInitialMaterial.renderQueue = (int)RenderQueue.Geometry; // 2000
+            this.shadowMapInitialMaterial.enableInstancing = true;
             this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAP_RESOLUTION * 1.5f), EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapInitialRenderTexture.wrapMode = TextureWrapMode.Repeat;
@@ -192,11 +193,7 @@ namespace ShadowMaker
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
                 {
-                    MaterialPropertyBlock properties = emitter.GetMaterialPropertyBlock();
-                    if (properties != null)
-                    {
-                        this.commandBuffer.DrawMesh(lightBlockerMesh, Matrix4x4.identity, this.shadowMapInitialMaterial, 0, -1, properties);
-                    }
+                    this.commandBuffer.DrawMeshInstanced(lightBlockerMesh, 0, this.shadowMapInitialMaterial, -1, new Matrix4x4[] { Matrix4x4.identity }, 1, emitter.GetMaterialPropertyBlock());
                 }
 
                 // Reduce shadow map range to 0-360.

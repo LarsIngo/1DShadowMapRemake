@@ -14,14 +14,20 @@
 
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
 
-            #include "UnityCG.cginc"
+			#include "UnityCG.cginc"
             #include "ShadowMap1D.cginc"
 
 			#define EMITTER_COUNT_MAX 64
 
-            float4 _EmitterParams;			// xy is the position, z is the angle in radians, w is the radius of the light.
-            float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
+            //float4 _EmitterParams;		// xy is the position, z is the angle in radians, w is the radius of the light.
+            //float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
+
+			UNITY_INSTANCING_CBUFFER_START(Props)
+				UNITY_DEFINE_INSTANCED_PROP(float4, _EmitterParams)
+				UNITY_DEFINE_INSTANCED_PROP(float4, _ShadowMapParams)
+			UNITY_INSTANCING_CBUFFER_END
 
 			float Intersect(float2 lineOneStart, float2 lineOneEnd, float2 lineTwoStart, float2 lineTwoEnd)
 			{
@@ -38,6 +44,7 @@
 			struct appdata
 			{
 				float3 vertex1 : POSITION;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 				float2 vertex2 : TEXCOORD0;
 			};
 
@@ -50,8 +57,12 @@
 
 			v2f vert(appdata v)
 			{
+				UNITY_SETUP_INSTANCE_ID(v);
+
 				// Chache global memory.
-				float2 lightPosition = _EmitterParams.xy;
+				//float2 lightPosition = _EmitterParams.xy;
+				float2 lightPosition = UNITY_ACCESS_INSTANCED_PROP(_EmitterParams).xy;
+				float4 shadowMapParams = UNITY_ACCESS_INSTANCED_PROP(_ShadowMapParams);
 
 				// Convert vertices to polar coordinates.
 				float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
@@ -90,7 +101,7 @@
 				//}
 
 				// Convert vertex to clip space.
-				o.vertex = float4(PolarAngleToClipSpace(angle1), _ShadowMapParams.y, 0.0f, 1.0f);
+				o.vertex = float4(PolarAngleToClipSpace(angle1), shadowMapParams.y, 0.0f, 1.0f);
 
 				// Store angle.
 				o.angle = float2(angle1, 0.0f);
@@ -101,7 +112,8 @@
 			float4 frag(v2f i) : SV_Target
 			{
 				// Chache global memory.
-				float4 emitterParams = _EmitterParams;
+				//float4 emitterParams = _EmitterParams;
+				float4 emitterParams = UNITY_ACCESS_INSTANCED_PROP(_EmitterParams);
 				float2 lightPosition = emitterParams.xy;
 				float radius = emitterParams.w;
 				
