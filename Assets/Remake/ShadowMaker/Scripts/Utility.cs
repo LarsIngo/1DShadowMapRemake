@@ -1,21 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace ShadowMaker
+﻿namespace ShadowMaker
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+
+    /// <summary>
+    /// Static class containing utility methods.
+    /// </summary>
     public static class Utility
     {
+        /// <summary>
+        /// Full quad mesh.
+        /// </summary>
         private static Mesh fullQuadMesh;
 
+        /// <summary>
+        /// Half quad mesh.
+        /// </summary>
         private static Mesh halfQuadMesh;
 
+        /// <summary>
+        /// Generates internal resources.
+        /// </summary>
         public static void GenerateInternalResources()
         {
             Utility.FullQuadMesh();
             Utility.HalfQuadMesh();
         }
 
+        /// <summary>
+        /// Loads a shader based on name.
+        /// </summary>
+        /// <param name="name">The name of the shader.</param>
+        /// <returns>The shader.</returns>
         public static Shader LoadShader(string name)
         {
             Shader shader = Shader.Find(name);
@@ -24,6 +41,11 @@ namespace ShadowMaker
             return shader;
         }
 
+        /// <summary>
+        /// Gets full quad mesh.
+        /// The mesh is generated if it does not exist.
+        /// </summary>
+        /// <returns>The full quad mesh.</returns>
         public static Mesh FullQuadMesh()
         {
             if (Utility.fullQuadMesh == null)
@@ -60,6 +82,11 @@ namespace ShadowMaker
             return Utility.fullQuadMesh;
         }
 
+        /// <summary>
+        /// Gets half quad mesh.
+        /// The mesh is generated if it does not exist.
+        /// </summary>
+        /// <returns>The half quad mesh.</returns>
         public static Mesh HalfQuadMesh()
         {
             if (Utility.halfQuadMesh == null)
@@ -96,27 +123,4 @@ namespace ShadowMaker
             return Utility.halfQuadMesh;
         }
     }
-//#if UNITY_EDITOR
-//    namespace Editor
-//    {
-//        [UnityEditor.CustomEditor(typeof(ShadowRenderer))]
-//        public class ShadowRendererEditor : UnityEditor.Editor
-//        {
-//            public override void OnInspectorGUI()
-//            {
-//                ShadowRenderer target = (ShadowRenderer)this.target;
-
-//                RenderTexture depthRenderTexture = target.GetDepthRenderTexture();
-//                if (depthRenderTexture != null)
-//                {
-//                    // TODO, DISPLAY PREVIEW IN INSPECTOR.
-//                    //Debug.Log("Draw");
-//                    //Texture2D preview = UnityEditor.AssetPreview.GetAssetPreview(depthRenderTexture);
-//                    //GUILayout.Label(preview);
-//                    //UnityEditor.EditorGUILayout.ObjectField(preview, typeof(Texture2D));
-//                }
-//            }
-//        }
-//    }
-//#endif
 }
