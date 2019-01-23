@@ -211,7 +211,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shadowMapInitialRenderTexture: {fileID: 0}
   shadowMapFinalRenderTexture: {fileID: 0}
-  shadowMapFinalBlurRenderTexture: {fileID: 0}
 --- !u!1 &360419139
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,11 +471,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e2e76885c709842921104a78858785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mColour: {r: 0.88235295, g: 0.20761244, b: 0.20761244, a: 1}
-  mSpread: 315
-  mFalloffExponent: 1
-  mAngleFalloffExponent: 1
-  mFullBrightRadius: 0
+  colour: {r: 1, g: 0, b: 0, a: 1}
+  spread: 180
+  falloffExponent: 1
+  angleFalloffExponent: 1
+  fullBrightRadius: 0
 --- !u!4 &871308409
 Transform:
   m_ObjectHideFlags: 0
@@ -571,11 +570,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e2e76885c709842921104a78858785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mColour: {r: 0, g: 1, b: 0, a: 1}
-  mSpread: 31
-  mFalloffExponent: 1
-  mAngleFalloffExponent: 1
-  mFullBrightRadius: 0
+  colour: {r: 0.2, g: 0.72, b: 0.2, a: 1}
+  spread: 180
+  falloffExponent: 1
+  angleFalloffExponent: 1
+  fullBrightRadius: 0
 --- !u!33 &1072128969
 MeshFilter:
   m_ObjectHideFlags: 0

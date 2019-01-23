@@ -54,13 +54,26 @@
         private RenderTexture shadowMapFinalRenderTexture;
 
         /// <summary>
+        /// Gets the shadow renderer instance in scene.
+        /// </summary>
+        public static ShadowRenderer Instance
+        {
+            get
+            {
+                ShadowRenderer instance = UnityEngine.Object.FindObjectOfType<ShadowRenderer>();
+                Debug.Assert(instance != null, typeof(ShadowRenderer).FullName + "Instance: Unable to find object in scene.");
+                return instance;
+            }
+        }
+
+        /// <summary>
         /// Gets the final shadow map.
         /// </summary>
         public static RenderTexture ShadowMapFinalRenderTexture
         {
             get
             {
-                return UnityEngine.Object.FindObjectOfType<ShadowRenderer>().shadowMapFinalRenderTexture;
+                return ShadowRenderer.Instance.shadowMapFinalRenderTexture;
             }
         }
 
