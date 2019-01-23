@@ -186,13 +186,13 @@ namespace ShadowMaker
             List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
             foreach (LightBlocker blocker in blockers)
             {
-                Mesh mesh = blocker.GetBlockerMesh();
-                Matrix4x4 matrix = blocker.transform.localToWorldMatrix;
+                Mesh blockerMesh = blocker.GetBlockerMesh();
+                Matrix4x4 blockerMatrix = blocker.transform.localToWorldMatrix;
 
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
                 foreach (LightEmitter emitter in emitters)
                 {
-                    this.commandBuffer.DrawMesh(mesh, matrix, this.shadowMapInitialMaterial, 0, -1, emitter.GetMaterialPropertyBlock());
+                    this.commandBuffer.DrawMesh(blockerMesh, blockerMatrix, this.shadowMapInitialMaterial, 0, -1, emitter.GetMaterialPropertyBlock());
                 }
             }
 
@@ -200,78 +200,6 @@ namespace ShadowMaker
             this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
             this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
             this.commandBuffer.DrawMesh(ShadowRenderer.FullQuadMesh(), Matrix4x4.identity, this.shadowMapFinalMaterial);
-        }
-
-        private static Mesh GenerateLightBlockerMesh(LightBlocker blocker)
-        {
-
-            List<Vector2> edges = new List<Vector2>();
-            blocker.GetEdges(edges);
-
-            List<Vector3> verts = new List<Vector3>();
-            List<Vector2> normals = new List<Vector2>();
-            for (int i = 0; i < edges.Count; i += 2)
-            {
-                verts.Add(edges[i + 0]);
-                verts.Add(edges[i + 1]);
-                normals.Add(edges[i + 1]);
-                normals.Add(edges[i + 0]);
-            }
-
-            // Simple 1:1 index buffer
-            int[] incides = new int[edges.Count];
-            for (int i = 0; i < edges.Count; i++)
-            {
-                incides[i] = i;
-            }
-
-            Mesh mesh = new Mesh();
-            mesh.SetVertices(verts);
-            mesh.SetUVs(0, normals);
-            mesh.SetIndices(incides, MeshTopology.Lines, 0);
-
-            return mesh;
-        }
-
-        // Create a mesh containing all the light blocker edges
-        private static Mesh CreateLightBlockerMesh()
-        {
-            List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
-
-            if (blockers.Count == 0)
-            {
-                return null;
-            }
-
-            List<Vector2> edges = new List<Vector2>();
-            foreach (LightBlocker blocker in blockers)
-            {
-                blocker.GetEdges(edges);
-            }
-
-            List<Vector3> verts = new List<Vector3>();
-            List<Vector2> normals = new List<Vector2>();
-            for (int i = 0; i < edges.Count; i += 2)
-            {
-                verts.Add(edges[i + 0]);
-                verts.Add(edges[i + 1]);
-                normals.Add(edges[i + 1]);
-                normals.Add(edges[i + 0]);
-            }
-
-            // Simple 1:1 index buffer
-            int[] incides = new int[edges.Count];
-            for (int i = 0; i < edges.Count; i++)
-            {
-                incides[i] = i;
-            }
-
-            Mesh mesh = new Mesh();
-            mesh.SetVertices(verts);
-            mesh.SetUVs(0, normals);
-            mesh.SetIndices(incides, MeshTopology.Lines, 0);
-
-            return mesh;
         }
     }
 //#if UNITY_EDITOR

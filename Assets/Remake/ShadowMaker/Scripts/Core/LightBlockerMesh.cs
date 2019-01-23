@@ -3,8 +3,15 @@
     using System.Collections.Generic;
     using UnityEngine;
 
-    public class LightMesh
+    public class LightBlockerMesh
     {
+        private Mesh renderMesh = null;
+
+        public Mesh GetRenderMesh()
+        {
+            return this.renderMesh;
+        }
+
         private class Triangle
         {
             public int vertexIndexA;
@@ -43,30 +50,37 @@
         private List<List<int>> outlines = new List<List<int>>();
         private HashSet<int> checkedVertices = new HashSet<int>();
 
-        private Mesh mesh;
+        private Mesh blockerMesh;
 
-        public Mesh GetMesh()
+        public Mesh GetBlockerMesh()
         {
-            return this.mesh;
+            return this.blockerMesh;
         }
 
-        public LightMesh(Mesh mesh)
+        public LightBlockerMesh(Mesh renderMesh)
         {
+            this.UpdateBlockerMesh(renderMesh);
+        }
+
+        public void UpdateBlockerMesh(Mesh renderMesh)
+        {
+            this.renderMesh = renderMesh;
+
             this.triangleDictionary.Clear();
             this.outlines.Clear();
             this.checkedVertices.Clear();
 
             // Get indices.
             List<int> indices = new List<int>();
-            for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; ++subMeshIndex)
+            for (int subMeshIndex = 0; subMeshIndex < renderMesh.subMeshCount; ++subMeshIndex)
             {
-                Debug.Assert(mesh.GetTopology(subMeshIndex) == MeshTopology.Triangles);
-                mesh.GetIndices(indices, subMeshIndex);
+                Debug.Assert(renderMesh.GetTopology(subMeshIndex) == MeshTopology.Triangles);
+                renderMesh.GetIndices(indices, subMeshIndex);
             }
 
             // Get vertices.
             List<Vector3> vertices = new List<Vector3>();
-            mesh.GetVertices(vertices);
+            renderMesh.GetVertices(vertices);
 
             // Create triangles.
             List<Triangle> triangles = new List<Triangle>();
@@ -91,7 +105,7 @@
             this.CalculateMeshOutlines(vertices);
 
             // Create mesh from outlines.
-            this.mesh = this.GenerateMesh(vertices);
+            this.blockerMesh = this.GenerateBlockerMesh(vertices);
         }
 
         void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
@@ -181,7 +195,7 @@
             return sharedTriangleCount == 1;
         }
 
-        Mesh GenerateMesh(List<Vector3> vertices)
+        Mesh GenerateBlockerMesh(List<Vector3> vertices)
         {
             List<Vector3> meshVertices = new List<Vector3>();
             List<Vector2> meshNeighbors = new List<Vector2>();

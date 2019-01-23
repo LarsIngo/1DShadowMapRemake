@@ -12,7 +12,7 @@ namespace ShadowMaker
     {
         private static List<LightBlocker> blockerList = new List<LightBlocker>();
 
-        private LightMesh lightMesh = null;
+        private LightBlockerMesh lightBlockerMesh = null;
 
         public static List<LightBlocker> GetActiveBlockerList()
         {
@@ -38,8 +38,19 @@ namespace ShadowMaker
 
         public Mesh GetBlockerMesh()
         {
-            LightMesh lightMesh = new LightMesh(this.GetRenderMesh());
-            return lightMesh.GetMesh();
+            // If blocker never has been generated.
+            if (this.lightBlockerMesh == null)
+            {
+                this.lightBlockerMesh = new LightBlockerMesh(this.GetRenderMesh());
+            }
+
+            // If render mesh has been changed, blocker mesh needs to be updated.
+            if (this.GetRenderMesh() != this.lightBlockerMesh.GetBlockerMesh())
+            {
+                this.lightBlockerMesh.UpdateBlockerMesh(this.GetRenderMesh());
+            }
+
+            return this.lightBlockerMesh.GetBlockerMesh();
         }
 
         private void Awake()
@@ -58,37 +69,6 @@ namespace ShadowMaker
 
         private void OnDestroy()
         {
-        }
-
-        public void GetEdges(List<Vector2> edges)
-        {
-            this.lightMesh = new LightMesh(this.GetRenderMesh());
-
-            Vector3[] vertices = this.lightMesh.GetMesh().vertices;
-
-            Vector3 v1 = vertices[0];//new Vector3(-0.5f, -0.5f, 0.0f);
-            Vector3 v2 = vertices[1];//new Vector3(+0.5f, -0.5f, 0.0f);
-            Vector3 v3 = vertices[2];//new Vector3(+0.5f, +0.5f, 0.0f);
-            Vector3 v4 = vertices[3];//new Vector3(-0.5f, +0.5f, 0.0f);
-
-            //v1 = transform.localToWorldMatrix.MultiplyPoint(v1);
-            //v2 = transform.localToWorldMatrix.MultiplyPoint(v2);
-            //v3 = transform.localToWorldMatrix.MultiplyPoint(v3);
-            //v4 = transform.localToWorldMatrix.MultiplyPoint(v4);
-
-            edges.Add(new Vector2(v1.x, v1.y));
-            edges.Add(new Vector2(v2.x, v2.y));
-
-            edges.Add(new Vector2(v2.x, v2.y));
-            edges.Add(new Vector2(v3.x, v3.y));
-
-            edges.Add(new Vector2(v3.x, v3.y));
-            edges.Add(new Vector2(v4.x, v4.y));
-
-            edges.Add(new Vector2(v4.x, v4.y));
-            edges.Add(new Vector2(v1.x, v1.y));
-
-            LightMesh lMesh = new LightMesh(this.GetRenderMesh());
         }
     }
 }
