@@ -217,11 +217,11 @@
             // LightEmitter.shader
             float angle = this.Angle;
             float radius = this.Radius;
-            Material mat = this.gameObject.GetComponent<MeshRenderer>().material; // TODO sharedMaterial?
+            Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
             mat.SetVector("_Color", colour);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, falloffExponent, angleFalloffExponent));
             mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, spread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - fullBrightRadius) * radius), fullBrightRadius * radius));
-            mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
+            mat.SetVector("_LightRadius", new Vector4(radius, 0.0f, 0.0f, 0.0f));
             mat.SetVector("_ShadowMapParams", LightEmitter.GetShadowMapParams(this.shadowMapSlot));
             mat.SetTexture("_ShadowMap", ShadowRenderer.ShadowMapFinalRenderTexture);
             mat.SetVector("_ShadowMapResolution", new Vector4(ShadowRenderer.SHADOWMAPRESOLUTION, 0.0f, 0.0f, 0.0f));
