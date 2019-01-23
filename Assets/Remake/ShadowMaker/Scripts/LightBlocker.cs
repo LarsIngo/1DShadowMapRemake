@@ -36,6 +36,12 @@ namespace ShadowMaker
             return this.gameObject.GetComponent<MeshFilter>().sharedMesh;
         }
 
+        public Mesh GetLightMesh()
+        {
+            LightMesh lightMesh = new LightMesh(this.GetMesh());
+            return lightMesh.GetMesh();
+        }
+
         private void Awake()
         {
         }
