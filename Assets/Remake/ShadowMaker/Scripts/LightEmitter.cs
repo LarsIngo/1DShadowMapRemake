@@ -20,7 +20,7 @@
         /// Color of the light.
         /// </summary>
         [SerializeField]
-        private Color colour = new Color(0.2f, 0.72f, 0.2f, 1.0f);
+        private Color color = new Color(0.2f, 0.72f, 0.2f, 1.0f);
 
         /// <summary>
         /// Spread of the light (in degrees).
@@ -218,7 +218,7 @@
             float angle = this.Angle;
             float radius = this.Radius;
             Material mat = this.gameObject.GetComponent<MeshRenderer>().sharedMaterial;
-            mat.SetVector("_Color", colour);
+            mat.SetVector("_Color", color);
             mat.SetVector("_LightPosition", new Vector4(transform.position.x, transform.position.y, falloffExponent, angleFalloffExponent));
             mat.SetVector("_Params2", new Vector4(angle * Mathf.Deg2Rad, spread * Mathf.Deg2Rad * 0.5f, 1.0f / ((1.0f - fullBrightRadius) * radius), fullBrightRadius * radius));
             mat.SetVector("_LightRadius", new Vector4(radius, 0.0f, 0.0f, 0.0f));
@@ -253,7 +253,7 @@
         /// <param name="alpha">The alpha value.</param>
         private void GizmosDrawArc(float alpha)
         {
-            UnityEditor.Handles.color = new Color(this.colour.r, this.colour.g, this.colour.b, alpha);
+            UnityEditor.Handles.color = new Color(this.color.r, this.color.g, this.color.b, alpha);
             UnityEditor.Handles.DrawSolidArc(this.transform.position, Vector3.forward, Quaternion.Euler(0, 0, -this.spread * 0.5f) * this.transform.right, this.spread, this.Radius);
         }
 
@@ -263,7 +263,7 @@
         /// <param name="alpha">The alpha value.</param>
         private void GizmosDrawCircle(float alpha)
         {
-            UnityEditor.Handles.color = new Color(this.colour.r, this.colour.g, this.colour.b, alpha);
+            UnityEditor.Handles.color = new Color(this.color.r, this.color.g, this.color.b, alpha);
             UnityEditor.Handles.DrawWireDisc(this.transform.position, Vector3.forward, this.Radius);
         }
 

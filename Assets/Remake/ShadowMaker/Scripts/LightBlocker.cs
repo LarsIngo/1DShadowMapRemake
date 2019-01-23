@@ -98,5 +98,39 @@
         {
             LightBlocker.RemoveBlocker(this);
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Unity method triggered when a gizmos is selected.
+        /// </summary>
+        private void OnDrawGizmosSelected()
+        {
+            GizmosDrawMesh(this.GetBlockerMesh(), 1.0f);
+        }
+
+        /// <summary>
+        /// Draws a mesh.
+        /// </summary>
+        /// <param name="alpha">The alpha value.</param>
+        private void GizmosDrawMesh(Mesh mesh, float alpha)
+        {
+            if (mesh != null)
+            {
+                if (mesh.normals.Length == 0)
+                {
+                    // Generate normals.
+                    List<Vector3> normals = new List<Vector3>();
+                    for (int i = 0; i < mesh.vertexCount; ++i)
+                    {
+                        normals.Add(new Vector3(0, 0, 1));
+                    }
+                    mesh.SetNormals(normals);
+                }
+
+                Gizmos.color = new Color(145.0f / 255.0f, 244.0f / 255.0f, 139.0f / 255.0f, alpha);
+                Gizmos.DrawMesh(mesh, 0, this.transform.position, this.transform.rotation, this.transform.lossyScale);
+            }
+        }
+#endif
     }
 }
