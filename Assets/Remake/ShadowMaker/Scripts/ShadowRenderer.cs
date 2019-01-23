@@ -158,27 +158,4 @@
             this.commandBuffer.DrawMesh(Utility.FullQuadMesh(), Matrix4x4.identity, this.shadowMapFinalMaterial);
         }
     }
-////#if UNITY_EDITOR
-////    namespace Editor
-////    {
-////        [UnityEditor.CustomEditor(typeof(ShadowRenderer))]
-////        public class ShadowRendererEditor : UnityEditor.Editor
-////        {
-////            public override void OnInspectorGUI()
-////            {
-////                ShadowRenderer target = (ShadowRenderer)this.target;
-////
-////                RenderTexture depthRenderTexture = target.GetDepthRenderTexture();
-////                if (depthRenderTexture != null)
-////                {
-////                    // TODO, DISPLAY PREVIEW IN INSPECTOR.
-////                    //Debug.Log("Draw");
-////                    //Texture2D preview = UnityEditor.AssetPreview.GetAssetPreview(depthRenderTexture);
-////                    //GUILayout.Label(preview);
-////                    //UnityEditor.EditorGUILayout.ObjectField(preview, typeof(Texture2D));
-////                }
-////            }
-////        }
-////    }
-////#endif
 }
