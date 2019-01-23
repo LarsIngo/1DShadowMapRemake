@@ -107,7 +107,7 @@
         /// <returns>The coordinates to write/read the correct row in the shadow map.</returns>
         public static Vector4 GetShadowMapParams(int slot)
         {
-            float u1 = ((float)slot + 0.5f) / ShadowRenderer.EMITTER_COUNT_MAX;
+            float u1 = ((float)slot + 0.5f) / ShadowRenderer.EMITTERCOUNTMAX;
             float u2 = (u1 - 0.5f) * 2.0f;
 
             if (   ////(SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGL2) // OpenGL2 is no longer supported in Unity 5.5+
@@ -224,7 +224,7 @@
             mat.SetVector("_LightRadius", new Vector4(radius, 0, 0, 0));
             mat.SetVector("_ShadowMapParams", LightEmitter.GetShadowMapParams(this.shadowMapSlot));
             mat.SetTexture("_ShadowMap", ShadowRenderer.ShadowMapFinalRenderTexture);
-            mat.SetVector("_ShadowMapResolution", new Vector4(ShadowRenderer.SHADOWMAP_RESOLUTION, 0.0f, 0.0f, 0.0f));
+            mat.SetVector("_ShadowMapResolution", new Vector4(ShadowRenderer.SHADOWMAPRESOLUTION, 0.0f, 0.0f, 0.0f));
         }
 
 #if UNITY_EDITOR
