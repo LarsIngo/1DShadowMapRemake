@@ -5,13 +5,6 @@
 
     public class LightBlockerMesh
     {
-        private Mesh renderMesh = null;
-
-        public Mesh GetRenderMesh()
-        {
-            return this.renderMesh;
-        }
-
         private class Triangle
         {
             public int vertexIndexA;
@@ -45,22 +38,31 @@
             }
         }
 
-
         private Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
+
         private List<List<int>> outlines = new List<List<int>>();
+
         private HashSet<int> checkedVertices = new HashSet<int>();
 
-        private Mesh blockerMesh;
+        private Mesh blockerMesh = null;
+
+        private Mesh renderMesh = null;
+
+        public LightBlockerMesh(Mesh renderMesh)
+        {
+            this.UpdateBlockerMesh(renderMesh);
+        }
 
         public Mesh GetBlockerMesh()
         {
             return this.blockerMesh;
         }
 
-        public LightBlockerMesh(Mesh renderMesh)
+        public Mesh GetRenderMesh()
         {
-            this.UpdateBlockerMesh(renderMesh);
+            return this.renderMesh;
         }
+
 
         public void UpdateBlockerMesh(Mesh renderMesh)
         {
@@ -110,7 +112,7 @@
             this.blockerMesh = this.GenerateBlockerMesh(vertices);
         }
 
-        void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
+        private void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
         {
             if (!triangleDictionary.ContainsKey(vertexIndexKey))
             {
@@ -120,7 +122,7 @@
             triangleDictionary[vertexIndexKey].Add(triangle);
         }
 
-        void CalculateMeshOutlines(List<Vector3> vertices)
+        private void CalculateMeshOutlines(List<Vector3> vertices)
         {
             for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
             {
@@ -141,7 +143,7 @@
             }
         }
 
-        void FollowOutline(int vertexIndex, int outlineIndex)
+        private void FollowOutline(int vertexIndex, int outlineIndex)
         {
             outlines[outlineIndex].Add(vertexIndex);
             checkedVertices.Add(vertexIndex);
@@ -153,7 +155,7 @@
             }
         }
 
-        int GetConnectedOutlineVertex(int vertexIndex)
+        private int GetConnectedOutlineVertex(int vertexIndex)
         {
             List<Triangle> trianglesContainingVertex = triangleDictionary[vertexIndex];
 
@@ -177,7 +179,7 @@
             return -1;
         }
 
-        bool IsOutlineEdge(int vertexA, int vertexB)
+        private bool IsOutlineEdge(int vertexA, int vertexB)
         {
             List<Triangle> trianglesContainingVertexA = triangleDictionary[vertexA];
             int sharedTriangleCount = 0;
