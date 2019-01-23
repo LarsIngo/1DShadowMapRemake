@@ -209,8 +209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d62bf8b8234506c4cab58feded35880e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shadowMapInitialRenderTexture: {fileID: 0}
-  shadowMapFinalRenderTexture: {fileID: 0}
 --- !u!1 &360419139
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,7 +469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e2e76885c709842921104a78858785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colour: {r: 1, g: 0, b: 0, a: 1}
+  color: {r: 0.72, g: 0.19999997, b: 0.19999997, a: 1}
   spread: 180
   falloffExponent: 1
   angleFalloffExponent: 1
@@ -570,7 +568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e2e76885c709842921104a78858785, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colour: {r: 0.2, g: 0.72, b: 0.2, a: 1}
+  color: {r: 0.2, g: 0.72, b: 0.2, a: 1}
   spread: 180
   falloffExponent: 1
   angleFalloffExponent: 1

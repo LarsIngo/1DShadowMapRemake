@@ -111,6 +111,7 @@
         /// <summary>
         /// Draws a mesh.
         /// </summary>
+        /// <param name="mesh">Mesh to draw.</param>
         /// <param name="alpha">The alpha value.</param>
         private void GizmosDrawMesh(Mesh mesh, float alpha)
         {
@@ -124,6 +125,7 @@
                     {
                         normals.Add(new Vector3(0, 0, 1));
                     }
+
                     mesh.SetNormals(normals);
                 }
 

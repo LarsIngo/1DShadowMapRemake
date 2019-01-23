@@ -173,6 +173,17 @@
         }
 
         /// <summary>
+        /// Updates the transform based on emitter properties.
+        /// </summary>
+        private void UpdateTransform()
+        {
+            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? Utility.FullQuadMesh() : Utility.HalfQuadMesh(); // Get either half or full quad depending on spread.
+            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.Radius; // Calculate local y scale to fit spread and radius.
+            float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
+            this.transform.localScale = new Vector3(this.transform.localScale.x, Mathf.Max(yScale / parentScaleFactor, 0.001f), 1.0f); // Update scale in order to fit mesh to light spread and radius.
+        }
+
+        /// <summary>
         /// Unity method triggered when Unity wakes game object.
         /// </summary>
         private void Awake()
@@ -186,6 +197,8 @@
                 material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Background; // 1000
                 meshRenderer.sharedMaterial = material;
             }
+
+            this.UpdateTransform();
         }
 
         /// <summary>
@@ -209,10 +222,7 @@
         /// </summary>
         private void OnWillRenderObject()
         {
-            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? Utility.FullQuadMesh() : Utility.HalfQuadMesh(); // Get either half or full quad depending on spread.
-            float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.Radius; // Calculate local y scale to fit spread and radius.
-            float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
-            this.transform.localScale = new Vector3(this.transform.localScale.x, Mathf.Max(yScale / parentScaleFactor, 0.001f), 1.0f); // Update scale in order to fit mesh to light spread and radius.
+            this.UpdateTransform();
 
             // LightEmitter.shader
             float angle = this.Angle;
