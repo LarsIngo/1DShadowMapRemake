@@ -78,7 +78,7 @@
         /// <param name="blocker">The blocker to remove.</param>
         private static void RemoveBlocker(LightBlocker blocker)
         {
-            Debug.Assert(!blocker.gameObject.activeInHierarchy, typeof(LightBlocker).FullName + ".AddBlocker: Blocker is active.");
+            Debug.Assert(!blocker.gameObject.activeInHierarchy, typeof(LightBlocker).FullName + ".RemoveBlocker: Blocker is active.");
             Debug.Assert(LightBlocker.blockerList.Contains(blocker), typeof(LightBlocker).FullName + ".RemoveBlocker: Not in list.");
             LightBlocker.blockerList.Remove(blocker);
         }
