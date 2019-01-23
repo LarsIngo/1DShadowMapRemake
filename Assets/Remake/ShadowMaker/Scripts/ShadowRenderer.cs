@@ -39,7 +39,6 @@
         /// <summary>
         /// The render texture for the initial shadow map.
         /// </summary>
-        [SerializeField]
         private RenderTexture shadowMapInitialRenderTexture;
 
         /// <summary>
@@ -50,7 +49,6 @@
         /// <summary>
         /// The render texture for the final shadow map.
         /// </summary>
-        [SerializeField]
         private RenderTexture shadowMapFinalRenderTexture;
 
         /// <summary>
