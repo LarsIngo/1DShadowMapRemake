@@ -10,10 +10,6 @@ namespace ShadowMaker
     {
         private CommandBuffer commandBuffer;
 
-        private static Mesh fullQuadMesh;
-
-        private static Mesh halfQuadMesh;
-
         private Material shadowMapInitialMaterial;
 
         [SerializeField] // TODO use Custom Editor.
@@ -32,17 +28,11 @@ namespace ShadowMaker
             }
         }
 
-        public const int SHADOWMAP_RESOLUTION = 1024;
-
-        // --- LIGHTEMITTER --- //
-        public const int EMITTER_COUNT_MAX = 64;
-
         private static ulong emitterAllocMask = 0;
-        
-        // --- Utility --- //
+
         public static int AllocateEmitterSlot()
         {
-            for (int i = 0; i < EMITTER_COUNT_MAX; i++)
+            for (int i = 0; i < ShadowRenderer.EMITTER_COUNT_MAX; i++)
             {
                 ulong mask = (ulong)1 << i;
                 if ((ShadowRenderer.emitterAllocMask & mask) == 0)
@@ -67,98 +57,20 @@ namespace ShadowMaker
             }
         }
 
-        public static Shader LoadShader(string name)
-        {
-            Shader shader = Shader.Find(name);
-            Debug.Assert(shader != null, typeof(ShadowRenderer).FullName + ".LoadShader: Shader (" + name + ") is null.");
-            Debug.Assert(shader.isSupported, typeof(ShadowRenderer).FullName + ".LoadShader: Shader (" + name + ") not supported.");
-            return shader;
-        }
+        public const int SHADOWMAP_RESOLUTION = 1024;
 
-        public static Mesh FullQuadMesh()
-        {
-                if (ShadowRenderer.fullQuadMesh == null)
-                {
-                    List<Vector3> verts = new List<Vector3>();
-                    List<Vector2> uvs0 = new List<Vector2>();
-                    int[] indices = new int[6];
+        public const int EMITTER_COUNT_MAX = 64;
 
-                    verts.Add(new Vector3(-1.0f, +1.0f, 0.0f));
-                    verts.Add(new Vector3(+1.0f, +1.0f, 0.0f));
-                    verts.Add(new Vector3(+1.0f, -1.0f, 0.0f));
-                    verts.Add(new Vector3(-1.0f, -1.0f, 0.0f));
-
-                    uvs0.Add(new Vector2(0.0f, 0.0f));
-                    uvs0.Add(new Vector2(1.0f, 0.0f));
-                    uvs0.Add(new Vector2(1.0f, 1.0f));
-                    uvs0.Add(new Vector2(0.0f, 1.0f));
-
-                    indices[0] = 0;
-                    indices[1] = 1;
-                    indices[2] = 2;
-                    indices[3] = 0;
-                    indices[4] = 2;
-                    indices[5] = 3;
-
-                    Mesh mesh = new Mesh();
-                    mesh.SetVertices(verts);
-                    mesh.SetUVs(0, uvs0);
-                    mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-
-                    ShadowRenderer.fullQuadMesh = mesh;
-                }
-
-                return ShadowRenderer.fullQuadMesh;
-        }
-
-        public static Mesh HalfQuadMesh()
-        {
-            if (ShadowRenderer.halfQuadMesh == null)
-            {
-                List<Vector3> verts = new List<Vector3>();
-                List<Vector2> uvs0 = new List<Vector2>();
-                int[] indices = new int[6];
-
-                verts.Add(new Vector3(+0.0f, +1.0f, 0.0f));
-                verts.Add(new Vector3(+1.0f, +1.0f, 0.0f));
-                verts.Add(new Vector3(+1.0f, -1.0f, 0.0f));
-                verts.Add(new Vector3(+0.0f, -1.0f, 0.0f));
-
-                uvs0.Add(new Vector2(0.0f, 0.0f));
-                uvs0.Add(new Vector2(1.0f, 0.0f));
-                uvs0.Add(new Vector2(1.0f, 1.0f));
-                uvs0.Add(new Vector2(0.0f, 1.0f));
-
-                indices[0] = 0;
-                indices[1] = 1;
-                indices[2] = 2;
-                indices[3] = 0;
-                indices[4] = 2;
-                indices[5] = 3;
-
-                Mesh mesh = new Mesh();
-                mesh.SetVertices(verts);
-                mesh.SetUVs(0, uvs0);
-                mesh.SetIndices(indices, MeshTopology.Triangles, 0);
-
-                ShadowRenderer.halfQuadMesh = mesh;
-            }
-
-            return ShadowRenderer.halfQuadMesh;
-        }
-
-        // --- Unity --- //
         private void Awake()
         {
+            Utility.GenerateInternalResources();
+
             this.commandBuffer = new CommandBuffer();
             Camera camera = this.gameObject.GetComponent<Camera>();
             camera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, this.commandBuffer);
 
-            // Initialze full quad mesh.
-            ShadowRenderer.FullQuadMesh();
-
             // Initial shadow map in range 0-540.
-            this.shadowMapInitialMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapInitial"));
+            this.shadowMapInitialMaterial = new Material(Utility.LoadShader("ShadowMaker/ShadowMapInitial"));
             ////this.shadowMapInitialMaterial.renderQueue = (int)RenderQueue.Geometry; // 2000
             this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAP_RESOLUTION * 1.5f), EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
@@ -167,7 +79,7 @@ namespace ShadowMaker
             this.shadowMapInitialRenderTexture.autoGenerateMips = false;
 
             // Final shadow map in range 0-360.
-            this.shadowMapFinalMaterial = new Material(ShadowRenderer.LoadShader("ShadowMaker/ShadowMapFinal"));
+            this.shadowMapFinalMaterial = new Material(Utility.LoadShader("ShadowMaker/ShadowMapFinal"));
             ////this.shadowMapFinalMaterial.renderQueue = (int)RenderQueue.Transparent; // 3000
             this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAP_RESOLUTION, EMITTER_COUNT_MAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
@@ -199,7 +111,7 @@ namespace ShadowMaker
             // Reduce shadow map range to 0-360.
             this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
             this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
-            this.commandBuffer.DrawMesh(ShadowRenderer.FullQuadMesh(), Matrix4x4.identity, this.shadowMapFinalMaterial);
+            this.commandBuffer.DrawMesh(Utility.FullQuadMesh(), Matrix4x4.identity, this.shadowMapFinalMaterial);
         }
     }
 //#if UNITY_EDITOR

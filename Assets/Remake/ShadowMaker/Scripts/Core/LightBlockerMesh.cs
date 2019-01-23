@@ -64,6 +64,8 @@
 
         public void UpdateBlockerMesh(Mesh renderMesh)
         {
+            UnityEngine.Object.DestroyImmediate(this.blockerMesh);
+
             this.renderMesh = renderMesh;
 
             this.triangleDictionary.Clear();

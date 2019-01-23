@@ -54,7 +54,7 @@ namespace ShadowMaker
             MeshRenderer meshRenderer = this.gameObject.GetComponent<MeshRenderer>();
             if (meshRenderer.sharedMaterial == null)
             {
-                Material material = new Material(ShadowRenderer.LoadShader("ShadowMaker/LightEmitter"));
+                Material material = new Material(Utility.LoadShader("ShadowMaker/LightEmitter"));
                 material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Background; // 1000
                 meshRenderer.sharedMaterial = material;
             }
@@ -72,7 +72,7 @@ namespace ShadowMaker
 
         private void OnWillRenderObject()
         {
-            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? ShadowRenderer.FullQuadMesh() : ShadowRenderer.HalfQuadMesh(); // Get either half or full quad depending on spread.
+            this.gameObject.GetComponent<MeshFilter>().sharedMesh = this.Spread > 180.0f ? Utility.FullQuadMesh() : Utility.HalfQuadMesh(); // Get either half or full quad depending on spread.
             float yScale = (this.Spread > 180.0f ? 1.0f : Mathf.Sin(this.Spread * 0.5f * Mathf.Deg2Rad)) * this.Radius; // Calculate local y scale to fit spread and radius.
             float parentScaleFactor = this.transform.lossyScale.y / this.transform.localScale.y; // Remove parent scale in y in order for light mesh to scale propely in y when childed.
             this.transform.localScale = new Vector3(this.transform.localScale.x, Mathf.Max(yScale / parentScaleFactor, 0.001f), 1.0f); // Update scale in order to fit mesh to light spread and radius.
