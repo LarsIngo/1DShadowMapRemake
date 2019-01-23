@@ -186,7 +186,7 @@ namespace ShadowMaker
             List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
             foreach (LightBlocker blocker in blockers)
             {
-                Mesh mesh = ShadowRenderer.GenerateLightBlockerMesh(blocker);
+                Mesh mesh = blocker.GetBlockerMesh();
                 Matrix4x4 matrix = blocker.transform.localToWorldMatrix;
 
                 List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();

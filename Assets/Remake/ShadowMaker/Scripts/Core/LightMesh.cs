@@ -184,25 +184,27 @@
         Mesh GenerateMesh(List<Vector3> vertices)
         {
             List<Vector3> meshVertices = new List<Vector3>();
+            List<Vector2> meshNeighbors = new List<Vector2>();
             List<int> meshIndices = new List<int>();
 
             foreach (List<int> outline in this.outlines)
             {
-                int startIndex = meshVertices.Count;
-                for (int i = 0; i < outline.Count - 1; ++i)
+                int count = outline.Count;
+                for (int i = 0; i < count; ++i)
                 {
-                    int offset = meshVertices.Count;
-                    meshVertices.Add(vertices[outline[i]]);
+                    meshIndices.Add(meshIndices.Count);
+                    meshVertices.Add(vertices[outline[i + 0]]);
+                    meshNeighbors.Add(vertices[outline[(i + 1) % count]]);
 
-                    meshIndices.Add(offset + 0);
-                    meshIndices.Add(offset + 1);
+                    meshIndices.Add(meshIndices.Count);
+                    meshVertices.Add(vertices[outline[(i + 1) % count]]);
+                    meshNeighbors.Add(vertices[outline[i + 0]]);
                 }
-
-                meshIndices[meshIndices.Count - 1] = startIndex;
             }
 
             Mesh mesh = new Mesh();
             mesh.SetVertices(meshVertices);
+            mesh.SetUVs(0, meshNeighbors);
             mesh.SetIndices(meshIndices.ToArray(), MeshTopology.Lines, 0);
             return mesh;
         }

@@ -31,14 +31,14 @@ namespace ShadowMaker
             LightBlocker.blockerList.Remove(blocker);
         }
 
-        public Mesh GetMesh()
+        public Mesh GetRenderMesh()
         {
             return this.gameObject.GetComponent<MeshFilter>().sharedMesh;
         }
 
-        public Mesh GetLightMesh()
+        public Mesh GetBlockerMesh()
         {
-            LightMesh lightMesh = new LightMesh(this.GetMesh());
+            LightMesh lightMesh = new LightMesh(this.GetRenderMesh());
             return lightMesh.GetMesh();
         }
 
@@ -62,7 +62,7 @@ namespace ShadowMaker
 
         public void GetEdges(List<Vector2> edges)
         {
-            this.lightMesh = new LightMesh(this.GetMesh());
+            this.lightMesh = new LightMesh(this.GetRenderMesh());
 
             Vector3[] vertices = this.lightMesh.GetMesh().vertices;
 
@@ -88,7 +88,7 @@ namespace ShadowMaker
             edges.Add(new Vector2(v4.x, v4.y));
             edges.Add(new Vector2(v1.x, v1.y));
 
-            LightMesh lMesh = new LightMesh(this.GetMesh());
+            LightMesh lMesh = new LightMesh(this.GetRenderMesh());
         }
     }
 }
