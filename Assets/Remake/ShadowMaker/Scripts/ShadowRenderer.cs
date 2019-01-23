@@ -178,34 +178,59 @@ namespace ShadowMaker
 
         private void OnPreRender()
         {
-            Mesh lightBlockerMesh = ShadowRenderer.CreateLightBlockerMesh();
+            this.commandBuffer.Clear();
+            this.commandBuffer.SetRenderTarget(this.shadowMapInitialRenderTexture);
+            this.commandBuffer.ClearRenderTarget(false, true, new Color(1, 1, 1, 1));
 
-            if (lightBlockerMesh != null)
+            // Render shadow map range 0-540.
+            List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
+            foreach (LightBlocker blocker in blockers)
             {
-                Mesh screenQuad = ShadowRenderer.FullQuadMesh();
+                Mesh mesh = ShadowRenderer.GenerateLightBlockerMesh(blocker);
+                Matrix4x4 matrix = blocker.transform.localToWorldMatrix;
 
-                this.commandBuffer.Clear();
-                this.commandBuffer.SetRenderTarget(this.shadowMapInitialRenderTexture);
-                this.commandBuffer.ClearRenderTarget(false, true, new Color(1, 1, 1, 1));
-
-                // Render shadow map range 0-540.
-                //List<LightBlocker> blockers = LightBlocker.GetActiveBlockerList();
-                //foreach (LightBlocker blocker in blockers)
-                //{
-                    List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
-                    foreach (LightEmitter emitter in emitters)
-                    {
-                        //this.commandBuffer.DrawMesh(blocker.GetLightMesh(), blocker.transform.localToWorldMatrix, this.shadowMapInitialMaterial, 0, -1, emitter.GetMaterialPropertyBlock());
-                        this.commandBuffer.DrawMesh(lightBlockerMesh, Matrix4x4.identity, this.shadowMapInitialMaterial, 0, -1, emitter.GetMaterialPropertyBlock());
-                    }
-                //}
-
-
-                // Reduce shadow map range to 0-360.
-                this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
-                this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
-                this.commandBuffer.DrawMesh(screenQuad, Matrix4x4.identity, this.shadowMapFinalMaterial);
+                List<LightEmitter> emitters = LightEmitter.GetActiveEmitterList();
+                foreach (LightEmitter emitter in emitters)
+                {
+                    this.commandBuffer.DrawMesh(mesh, matrix, this.shadowMapInitialMaterial, 0, -1, emitter.GetMaterialPropertyBlock());
+                }
             }
+
+            // Reduce shadow map range to 0-360.
+            this.shadowMapFinalMaterial.SetTexture("_ShadowMap", this.shadowMapInitialRenderTexture);
+            this.commandBuffer.SetRenderTarget(this.shadowMapFinalRenderTexture);
+            this.commandBuffer.DrawMesh(ShadowRenderer.FullQuadMesh(), Matrix4x4.identity, this.shadowMapFinalMaterial);
+        }
+
+        private static Mesh GenerateLightBlockerMesh(LightBlocker blocker)
+        {
+
+            List<Vector2> edges = new List<Vector2>();
+            blocker.GetEdges(edges);
+
+            List<Vector3> verts = new List<Vector3>();
+            List<Vector2> normals = new List<Vector2>();
+            for (int i = 0; i < edges.Count; i += 2)
+            {
+                verts.Add(edges[i + 0]);
+                verts.Add(edges[i + 1]);
+                normals.Add(edges[i + 1]);
+                normals.Add(edges[i + 0]);
+            }
+
+            // Simple 1:1 index buffer
+            int[] incides = new int[edges.Count];
+            for (int i = 0; i < edges.Count; i++)
+            {
+                incides[i] = i;
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts);
+            mesh.SetUVs(0, normals);
+            mesh.SetIndices(incides, MeshTopology.Lines, 0);
+
+            return mesh;
         }
 
         // Create a mesh containing all the light blocker edges

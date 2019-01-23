@@ -52,12 +52,12 @@
 				float2 lightPosition = _EmitterParams.xy;
 				float4 shadowMapParams = _ShadowMapParams;
 
-				//v.vertex1.xy = mul(unity_ObjectToWorld, float4(v.vertex1.xy, 0.0f, 1.0f)).xy;
-				//v.vertex2.xy = mul(unity_ObjectToWorld, float4(v.vertex2.xy, 0.0f, 1.0f)).xy;
+				float2 vertex1 = mul(unity_ObjectToWorld, float4(v.vertex1.xy, 0.0f, 1.0f)).xy;
+				float2 vertex2 = mul(unity_ObjectToWorld, float4(v.vertex2.xy, 0.0f, 1.0f)).xy;
 
 				// Convert vertices to polar coordinates.
-				float2 polar1 = ToPolar(v.vertex1.xy, lightPosition);
-				float2 polar2 = ToPolar(v.vertex2.xy, lightPosition);
+				float2 polar1 = ToPolar(vertex1, lightPosition);
+				float2 polar2 = ToPolar(vertex2, lightPosition);
 
 				// Get angles.
 				float angle1 = polar1.x;
@@ -66,7 +66,7 @@
 				v2f o;
 
 				// Store edge.
-				o.edge = float4(v.vertex1.xy, v.vertex2.xy);
+				o.edge = float4(vertex1.xy, vertex2.xy);
 				o.edge = lerp(o.edge, o.edge.zwxy, step(angle1, angle2));
 
 				// Check whether vertex edge was cut off.

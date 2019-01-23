@@ -71,10 +71,10 @@ namespace ShadowMaker
             Vector3 v3 = vertices[2];//new Vector3(+0.5f, +0.5f, 0.0f);
             Vector3 v4 = vertices[3];//new Vector3(-0.5f, +0.5f, 0.0f);
 
-            v1 = transform.localToWorldMatrix.MultiplyPoint(v1);
-            v2 = transform.localToWorldMatrix.MultiplyPoint(v2);
-            v3 = transform.localToWorldMatrix.MultiplyPoint(v3);
-            v4 = transform.localToWorldMatrix.MultiplyPoint(v4);
+            //v1 = transform.localToWorldMatrix.MultiplyPoint(v1);
+            //v2 = transform.localToWorldMatrix.MultiplyPoint(v2);
+            //v3 = transform.localToWorldMatrix.MultiplyPoint(v3);
+            //v4 = transform.localToWorldMatrix.MultiplyPoint(v4);
 
             edges.Add(new Vector2(v1.x, v1.y));
             edges.Add(new Vector2(v2.x, v2.y));
