@@ -28,8 +28,6 @@ Shader "ShadowMaker/ShadowMapFinal"
             #pragma fragment frag
             #include "UnityCG.cginc"
             #include "ShadowMap1D.cginc"
-
-            #define DEPTH_BIAS 0.001f
             
             struct appdata_t
             {
@@ -55,9 +53,6 @@ Shader "ShadowMaker/ShadowMapFinal"
                 {
                     s = min(s, tex2D(_ShadowMap, float2(u + (2.0f / 3.0f), v)).r);
                 }
-
-                // Apply depth bias.
-                s += DEPTH_BIAS;
 
                 return fixed4(s, s, s, s);
             }

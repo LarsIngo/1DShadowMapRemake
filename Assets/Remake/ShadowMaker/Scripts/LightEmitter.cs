@@ -27,7 +27,7 @@
         /// </summary>
         [SerializeField]
         [Range(0, 360)]
-        private float spread = 180;
+        private float spread = 180.0f;
 
         /// <summary>
         /// Falloff exponent of the light (range).
@@ -138,11 +138,8 @@
         /// <returns>The material property block.</returns>
         public MaterialPropertyBlock GetMaterialPropertyBlock()
         {
-            float angle = this.Angle;
-            float radius = this.Radius;
-
             // ShadowMapInitial.shader
-            this.propertyBlock.SetVector("_EmitterParams", new Vector4(transform.position.x, transform.position.y, angle * Mathf.Deg2Rad, radius));
+            this.propertyBlock.SetVector("_EmitterParams", new Vector4(transform.position.x, transform.position.y, this.Angle * Mathf.Deg2Rad, this.Radius));
             this.propertyBlock.SetVector("_ShadowMapParams", LightEmitter.GetShadowMapParams(this.shadowMapSlot));
 
             return this.propertyBlock;

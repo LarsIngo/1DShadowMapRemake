@@ -123,8 +123,7 @@
 
             // Initial shadow map in range 0-540.
             this.shadowMapInitialMaterial = new Material(Utility.LoadShader("ShadowMaker/ShadowMapInitial"));
-            ////this.shadowMapInitialMaterial.renderQueue = (int)RenderQueue.Geometry; // 2000
-            this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAPRESOLUTION * 1.5f), EMITTERCOUNTMAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
+            this.shadowMapInitialRenderTexture = new RenderTexture(Mathf.RoundToInt(SHADOWMAPRESOLUTION * 1.5f), EMITTERCOUNTMAX, 0, RenderTextureFormat.R8, RenderTextureReadWrite.Default);
             this.shadowMapInitialRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapInitialRenderTexture.wrapMode = TextureWrapMode.Repeat;
             this.shadowMapInitialRenderTexture.anisoLevel = 0;
@@ -132,8 +131,7 @@
 
             // Final shadow map in range 0-360.
             this.shadowMapFinalMaterial = new Material(Utility.LoadShader("ShadowMaker/ShadowMapFinal"));
-            ////this.shadowMapFinalMaterial.renderQueue = (int)RenderQueue.Transparent; // 3000
-            this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAPRESOLUTION, EMITTERCOUNTMAX, 0, RenderTextureFormat.RHalf, RenderTextureReadWrite.Default);
+            this.shadowMapFinalRenderTexture = new RenderTexture(SHADOWMAPRESOLUTION, EMITTERCOUNTMAX, 0, RenderTextureFormat.R8, RenderTextureReadWrite.Default);
             this.shadowMapFinalRenderTexture.filterMode = FilterMode.Point;
             this.shadowMapFinalRenderTexture.wrapMode = TextureWrapMode.Repeat;
             this.shadowMapFinalRenderTexture.anisoLevel = 0;

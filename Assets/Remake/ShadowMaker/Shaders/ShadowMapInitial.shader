@@ -18,8 +18,10 @@
 			#include "UnityCG.cginc"
             #include "ShadowMap1D.cginc"
 
+			#define DEPTH_BIAS 0.035f	// Depth bias applied to shadow map.
+
             float4 _EmitterParams;		// xy is the position, z is the angle in radians, w is the radius of the light.
-            float4 _ShadowMapParams;		// this is the row to write to in the shadow map. x is used to write, y to read.
+            float4 _ShadowMapParams;	// this is the row to write to in the shadow map. x is used to write, y to read.
 
 			float Intersect(float2 lineOneStart, float2 lineOneEnd, float2 lineTwoStart, float2 lineTwoEnd)
 			{
@@ -48,7 +50,7 @@
 
 			v2f vert(appdata v)
 			{
-				// Chache global memory.
+				// Cache global memory.
 				float2 lightPosition = _EmitterParams.xy;
 				float4 shadowMapParams = _ShadowMapParams;
 
@@ -77,6 +79,8 @@
 					float factor = (sign(angle1 - angle2) + 1.0f) * 0.5f;
 					angle1 = max(angle1, angle2) + (2.0f * UNITY_PI - diff) * factor;
 				}
+
+				// Flip edge if facing opposite direction.
 				//float diff = abs(angle1 - angle2);
 				//if (diff >= UNITY_PI)
 				//{
@@ -120,6 +124,9 @@
 
 				// Find intersection between light vector and vertex edge.
 				float t = Intersect(lightPosition, lightEnd, i.edge.xy, i.edge.zw);
+
+				// Apply depth bias.
+				t += DEPTH_BIAS / length(lightEnd - lightPosition);
 
 				// Return intersection scalar value.
 				return float4(t,t,t,t);
